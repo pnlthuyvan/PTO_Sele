@@ -1,6 +1,8 @@
 
 *.bin
 *.manifest
+*.testlog
+*.vsidx
 .vs/PTO/v17/TestStore/2/031.testlog
 .vs/PTO/v17/DocumentLayout.json
 .vs/PTO/v17/.suo
@@ -14,6 +16,7 @@
 .vs/PTO/FileContentIndex/1ef62c57-57d4-4abd-8619-54a36ae9feca.vsidx
 .vs/PTO/DesignTimeBuild/.dtbcache.v2
 .vs/PTO/config/applicationhost.config
+
 bin/
 obj/
 Debug/

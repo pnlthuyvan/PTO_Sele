@@ -32,8 +32,7 @@ namespace PTO.TestScripts.Takeoff_Linear
             demo = new DemoPage(driverTest);
         }
 
-        [Test, Category("Job")]
-
+        [Test, Category($"{Sections.TAKEOFF_LINEAR}")]
         public void TestMethod_Open_Job()
         {
             demo.OpenJob(JOB_NUMBER);

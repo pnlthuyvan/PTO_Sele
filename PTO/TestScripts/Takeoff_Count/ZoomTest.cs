@@ -37,7 +37,7 @@ namespace PTO.TestScripts.Takeoff_Count
         }
 
 
-        [Test, Category("Zoom")]
+        [Test, Category($"{Sections.TAKEOFF_COUNT}")]
         public void TestMethod_Zoom_Draw()
         {
             demo.OpenJob(JOB_NUMBER);

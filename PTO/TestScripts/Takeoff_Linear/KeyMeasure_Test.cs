@@ -44,7 +44,7 @@ namespace PTO.TestScripts.Takeoff_Linear
             demo = new DemoPage(driverTest);
         }
 
-        [Test, Category("KeyMeasure")]
+        [Test, Category($"{Sections.TAKEOFF_LINEAR}")]
         public void TestMethod_Select_KeyMeasure()
         {
             demo.OpenJob(JOB_NUMBER);

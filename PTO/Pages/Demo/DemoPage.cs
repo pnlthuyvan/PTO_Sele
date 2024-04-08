@@ -2,17 +2,14 @@
 using OpenQA.Selenium.Interactions;
 using PTO.Constants;
 using PTO.Utilities;
-using Serilog;
 using System.Text.RegularExpressions;
 
 namespace PTO.Pages.Demo
 {
     public class DemoPage (IWebDriver driverTest)
     {
-        private static readonly ILogger log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
         private readonly string loadingIcon = "//*[@id='LoadingModal']/div";
-
-        private IWebDriver driver = driverTest;
+        private readonly IWebDriver driver = driverTest;
 
 
         /// <summary>
@@ -23,7 +20,8 @@ namespace PTO.Pages.Demo
         {
             try
             {
-                ExtentReportsHelper.LogInformation($"start job");
+                ExtentReportsHelper.LogInformation(null, "<font color='lavender'><b>Step 1: Open Job.</b></font>");
+
 
                 driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
 
@@ -65,6 +63,8 @@ namespace PTO.Pages.Demo
         {
             try
             {
+                ExtentReportsHelper.LogInformation(null, "<font color='lavender'><b>Step 2: Open Sheet.</b></font>");
+
                 driver.FindElement(By.XPath($"//span[@title = '{sheetName}' and not(contains(@data-bind, 'style'))]")).Click();
 
                 // Wait until rendering succesfully
@@ -79,8 +79,10 @@ namespace PTO.Pages.Demo
             }
             catch (Exception e)
             {
-                Assert.Fail($"<font color = 'yellow'>Could not open an existing job. There is an error exception: {e.Message}</font>");
+                ExtentReportsHelper.LogFailAndCap(driver, $"<font color = 'red'>Could not open an existing job. There is an error exception: {e.Message}</font>");
             }
+            ExtentReportsHelper.LogPassAndCap(driver, $"<font color = 'green'>Select Sheet successfully.</font>");
+
         }
 
         /// <summary>
@@ -91,9 +93,12 @@ namespace PTO.Pages.Demo
         {
             try
             {
+                ExtentReportsHelper.LogInformation(null, "<font color='lavender'><b>Step 4: Select KeyMeasure from Uncategozied.</b></font>");
+
                 // Select Categoey
                 driver.FindElement(By.XPath($"//span[text() = 'Uncategorized']")).Click();
-                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
+                UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, loadingIcon);
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
 
                 // Wait until KeyMeasure displays
                 UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, $"//span[text() = '{keyMeasure}']");
@@ -107,13 +112,16 @@ namespace PTO.Pages.Demo
                 UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, modalXpath);
 
                 // Click Apply
+                UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, "//div[@id= 'preTakeoffModal']//button[text()='Apply']");
                 driver.FindElement(By.XPath($"//div[@id= 'preTakeoffModal']//button[text()='Apply']")).Click();
-                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
             }
             catch (Exception e)
             {
-                Assert.Fail($"<font color = 'yellow'>Could not open an existing job. There is an error exception: {e.Message}</font>");
+                ExtentReportsHelper.LogFailAndCap(driver, $"<font color = 'red'>Could not open an existing job. There is an error exception: {e.Message}</font>");
             }
+            ExtentReportsHelper.LogPassAndCap(driver, $"<font color = 'green'>Select Key Measure successfully.</font>");
+
         }
 
         /// <summary>
@@ -126,6 +134,8 @@ namespace PTO.Pages.Demo
         {
             try
             {
+                ExtentReportsHelper.LogInformation(null, "<font color='lavender'><b>Step 3: Zoom in.</b></font>");
+
                 IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
 
                 // Execute JavaScript to set the zoom level
@@ -156,9 +166,11 @@ namespace PTO.Pages.Demo
             }
             catch (Exception e)
             {
-                Assert.Fail($"<font color = 'yellow'>Could not zoom sheet. There is an error exception: {e.Message}</font>");
+                ExtentReportsHelper.LogFailAndCap(driver, $"<font color = 'red'>Could not zoom sheet. There is an error exception: {e.Message}</font>");
 
             }
+            ExtentReportsHelper.LogPassAndCap(driver, $"<font color = 'green'><b>Zoom in successfully.</b></font>");
+
         }
 
         /// <summary>
@@ -168,27 +180,31 @@ namespace PTO.Pages.Demo
         {
             try
             {
+                ExtentReportsHelper.LogInformation(null, "<font color='lavender'><b>Step 5: Draw the linear.</b></font>");
+
                 IWebElement image = driver.FindElement(By.CssSelector("#takeoff-container-takeoff-tab"));
 
-                Actions action = new Actions(driver);
+                Actions action = new(driver);
 
-                action
-                        .MoveToElement(image, 40, 100)
-                        .Click()
-                        .Perform();
-                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
+                   action
+                           .MoveToElement(image, 40, 100)
+                           .Click()
+                           .Perform();
 
-                action
-                   .MoveToElement(image, 40, 200)
-                   .Click()
-                   .Perform();
+                   driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
+
+                   action
+                      .MoveToElement(image, 55, 100)
+                      .Click()
+                      .Perform();
+                  
 
                 // Click first coordinate
                 //action.Click(driver.FindElement(By.CssSelector("#takeoff-container-takeoff-tab"))).MoveByOffset(1, 90).Release().Build().Perform();
                 //// Click second coordinate
                 //action.Click(driver.FindElement(By.CssSelector("#takeoff-container-takeoff-tab"))).MoveByOffset(60, 90).Release().Build().Perform();
 
-                /*action.MoveByOffset(0, 100).Click()
+               /* action.MoveByOffset(0, 100).Click()
                     .MoveByOffset(0, -100).Click()
                     .Perform();
                 */
@@ -208,22 +224,25 @@ namespace PTO.Pages.Demo
 
                 // Click stop record
                 driver.FindElement(By.XPath($"//button[@title='Stop Recording']")).Click();
+                UtilsHelper.WaitForElementIsInVisible(driver, FindType.CssSelector, loadingIcon);
 
                 float afterDrawTakeoffValue = float.Parse(driver.FindElement(By.XPath(calculatedValueSelector)).Text);
 
                 // If after = before + calculation => correct
                 if (afterDrawTakeoffValue == beforeDrawTakeoffValue + calculatedValue)
                 {
-                    ExtentReportsHelper.LogPassAndCap(driver, "Calculation is CORRECT");
+                    ExtentReportsHelper.LogPassAndCap(driver, "<font color='green'><b>Calculation is CORRECT</font>");
                 }
                 else
                 {
-                    ExtentReportsHelper.LogFailAndCap(driver, "Calculation is INCORRECT");
+                    ExtentReportsHelper.LogFailAndCap(driver, "<font color='red'>Calculation is INCORRECT" +
+                        $"<br>Expected result: {afterDrawTakeoffValue}" +
+                        $"<br>Actual result: {beforeDrawTakeoffValue + calculatedValue}</br></font>");
                 }
             }
             catch (Exception e)
             {
-                Assert.Fail($"<font color = 'yellow'>Could not open an existing job. There is an error exception: {e.Message}</font>");
+                ExtentReportsHelper.LogFailAndCap(driver, $"<font color = 'red'>Could not open an existing job. There is an error exception: {e.Message}</font>");
             }
         }
 
@@ -265,7 +284,7 @@ namespace PTO.Pages.Demo
             }
             else
             {
-                Console.WriteLine("Pattern not matched.");
+                ExtentReportsHelper.LogFail($"<font color = 'red'>There is an error while calculate the quantity.</font>");
                 return 0;
             }
         }

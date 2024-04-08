@@ -37,7 +37,7 @@ namespace PTO.TestScripts.Takeoff_Area
             demo = new DemoPage(driverTest);
         }
 
-        [Test, Category("Sheet")]
+        [Test, Category($"{Sections.TAKEOFF_AREA}")]
         public void TestMethod_Select_Sheet()
         {
             demo.OpenJob(JOB_NUMBER);

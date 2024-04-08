@@ -10,7 +10,6 @@ namespace PTO.TestScripts.Takeoff_Area
     //[Parallelizable]
     public class ReportTest : BaseTestScript
     {
-
         private DemoPage demo;
 
         // private IWebDriver firstDriverTest;
@@ -34,7 +33,7 @@ namespace PTO.TestScripts.Takeoff_Area
             demo = new DemoPage(driverTest);
         }
 
-        [Test, Category("Token")]
+        [Test, Category($"{Sections.TAKEOFF_AREA}")]
         public void TestMethod_Report()
         {
             demo.OpenJob(JOB_NUMBER);

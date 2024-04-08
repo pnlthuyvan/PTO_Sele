@@ -38,7 +38,7 @@ namespace PTO.TestScripts.Takeoff_Linear
         }
 
 
-        [Test, Category("Linear")]
+        [Test, Category($"{Sections.TAKEOFF_LINEAR}")]
         public void TestMethod_Draw_Linear()
         {
             demo.OpenJob(JOB_NUMBER);
