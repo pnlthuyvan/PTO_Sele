@@ -11,19 +11,12 @@ namespace PTO.TestScripts.Takeoff_Linear
     [Parallelizable]
     public class SheetTest : BaseTestScript
     {
-        private LoginPage loginPage;
         private DemoPage demo;
-
         private IWebDriver driverTest;
-
-        private const string CHROME = "Chrome";
-        private const string FIREFOX = "FireFox";
 
         private const string JOB_NUMBER = "290224";
         private const string SHEET = "Sheet_1.2";
         private const string MEASUREMENT = "BV_KM_2_Import";
-
-        private string loginUrl;
 
         public override void SetupTestSectionName()
         {

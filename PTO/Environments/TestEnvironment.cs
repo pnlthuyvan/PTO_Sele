@@ -194,7 +194,7 @@ namespace PTO.Manager
 
         private static string AssemblyDirectory()
         {
-            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            string codeBase = Assembly.GetEntryAssembly().Location;
             UriBuilder uri = new UriBuilder(codeBase);
             string path = Uri.UnescapeDataString(uri.Path);
             return Path.GetDirectoryName(path);

@@ -1,7 +1,6 @@
 ﻿using OpenQA.Selenium;
 using PTO.Base;
 using PTO.Utilities;
-using PTO.Pages.LoginPage;
 using PTO.Pages.Demo;
 using Pipeline.Common.Constants;
 

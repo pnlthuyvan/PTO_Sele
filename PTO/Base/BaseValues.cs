@@ -85,7 +85,7 @@ namespace PTO.Base
         /// </summary>
         public static int DebugPort => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.DebugPort));
 
-        public static int PageloadTimeOuts => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.PageLoadTimeOut));
+        public static int PageLoadTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.PageLoadTimeOut));
 
 
         /// <summary>

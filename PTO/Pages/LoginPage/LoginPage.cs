@@ -6,7 +6,7 @@ using PTO.Utilities;
 
 namespace PTO.Pages.LoginPage
 {
-    public class LoginPage(IWebDriver driver)
+    public class LoginPage(IWebDriver driver) : BasePage (driver)
     {
         private IWebDriver driverTest = driver;
 

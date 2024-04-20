@@ -35,4 +35,4 @@ using System.Runtime.InteropServices;
 
 
 // Number browser
-[assembly: LevelOfParallelism(6)]
+[assembly: LevelOfParallelism(2)]

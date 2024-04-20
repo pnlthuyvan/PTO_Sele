@@ -53,7 +53,7 @@ namespace PTO.Utilities
         }
 
 
-        /*********************************** CHROME HANFLER ************************************************/
+        /*********************************** CHROME HANDLER ************************************************/
         /// <summary>
         /// Set up Chrome driver
         /// </summary>
@@ -65,7 +65,7 @@ namespace PTO.Utilities
             if (BaseValues.Headless)
             {
                 UtilsHelper.DebugOutput("Setting web driver to run using the 'headless' flag...", false);
-                chromeOptions.AddArgument("--headless");
+                chromeOptions.AddArgument("--headless=new");
             }
 
             if (BaseValues.DebugMode)
@@ -94,7 +94,7 @@ namespace PTO.Utilities
             ChromeDriverService service;
             service = ChromeDriverService.CreateDefaultService();
 
-            return new ChromeDriver(service, _driverConfig, TimeSpan.FromSeconds(BaseValues.PageloadTimeOuts));
+            return new ChromeDriver(service, _driverConfig, TimeSpan.FromSeconds(BaseValues.PageLoadTimeOut));
         }
 
 
@@ -111,7 +111,7 @@ namespace PTO.Utilities
             if (BaseValues.Headless)
             {
                 UtilsHelper.DebugOutput("Setting web driver to run using the 'headless' flag...", false);
-                firefoxOptions.AddArgument("--headless");
+                firefoxOptions.AddArgument("--headless=new");
             }
 
             if (BaseValues.DebugMode)
@@ -135,7 +135,7 @@ namespace PTO.Utilities
             FirefoxDriverService service;
             service = FirefoxDriverService.CreateDefaultService();
 
-            return new FirefoxDriver(service, _driverConfig, TimeSpan.FromSeconds(BaseValues.PageloadTimeOuts));
+            return new FirefoxDriver(service, _driverConfig, TimeSpan.FromSeconds(BaseValues.PageLoadTimeOut));
         }
 
         /*********************************** DOWNLOAD HANDLER ************************************************/

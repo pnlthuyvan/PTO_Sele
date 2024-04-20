@@ -1,14 +1,12 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenQA.Selenium;
+using PTO.Base;
+using PTO.Constants;
 
 namespace PTO.Controls
 {
-    public class CommonElement
+    public class CommonElement : BaseControl
     {
+        public CommonElement(IWebDriver driver) : base(driver) { }
+        public CommonElement(IWebDriver driver, FindType findType, string valueToFind) : base(driver, findType, valueToFind) { }
     }
 }

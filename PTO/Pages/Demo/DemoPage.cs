@@ -10,6 +10,7 @@ namespace PTO.Pages.Demo
     {
         private readonly string loadingIcon = "//*[@id='LoadingModal']/div";
         private readonly IWebDriver driver = driverTest;
+        private readonly int waitingTime = 20;
 
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace PTO.Pages.Demo
                 ExtentReportsHelper.LogInformation(null, "<font color='lavender'><b>Step 1: Open Job.</b></font>");
 
 
-                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(waitingTime);
 
                 // Click Open Job button
                 driver.FindElements(By.XPath("//button[text() = 'Open Job']")).FirstOrDefault().Click();
@@ -72,14 +73,14 @@ namespace PTO.Pages.Demo
                 var renderingXpath = "//span{text() = 'Rendering...']";
 
                 // Wait to display
-                UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, renderingXpath, 20);
+                UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, renderingXpath, waitingTime);
 
                 // Wait to disappear
-                UtilsHelper.WaitForElementIsInVisible(driver, FindType.XPath, renderingXpath, 20);
+                UtilsHelper.WaitForElementIsInVisible(driver, FindType.XPath, renderingXpath, waitingTime);
             }
             catch (Exception e)
             {
-                ExtentReportsHelper.LogFailAndCap(driver, $"<font color = 'red'>Could not open an existing job. There is an error exception: {e.Message}</font>");
+                ExtentReportsHelper.LogFailAndCap(driver, $"<font color = 'red'>Could not open an existing sheet '{sheetName}'. There is an error exception: {e.Message}</font>");
             }
             ExtentReportsHelper.LogPassAndCap(driver, $"<font color = 'green'>Select Sheet successfully.</font>");
 
@@ -104,8 +105,11 @@ namespace PTO.Pages.Demo
                 UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, $"//span[text() = '{keyMeasure}']");
 
                 // Select Key Measure
-                driver.FindElement(By.XPath($"//span[text() = '{keyMeasure}']")).Click();
-                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
+                var keyMeasureName = driver.FindElement(By.XPath("//span[text() = '{keyMeasure}']"));
+                IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
+                executor.ExecuteScript("arguments[0].click();", keyMeasureName);
+                //driver.FindElement(By.XPath($"//span[text() = '{keyMeasure}']")).Click();
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(waitingTime);
 
                 // Wait until modal displays
                 string modalXpath = "//div[@id= 'preTakeoffModal']//h2[text() = 'Measurement Properties']";
@@ -130,7 +134,7 @@ namespace PTO.Pages.Demo
         /// <param name="zoomLevel"></param>
         /// <param name="left"></param>
         /// <param name="top"></param>
-        public void ZoomInOut(int zoomLevel = 70, int left = 2000, int top = 1100)
+        public void ZoomInOut(int zoomLevel = 70, int left = 500, int top = 200)
         {
             try
             {
@@ -150,9 +154,12 @@ namespace PTO.Pages.Demo
 
                 Actions builder = new Actions(driver);
                 ZoomSlider.Click();
+
+                // Click on slider, it will move and zoom 50% first
+
                 driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
                 builder.ClickAndHold(ZoomSlider)
-                       .MoveByOffset(0, -20) // (x, y) (adjust if needed)
+                       .MoveByOffset(0, 10) // (x, y) (adjust if needed)
                        .Release()
                        .Perform();
 
@@ -187,14 +194,14 @@ namespace PTO.Pages.Demo
                 Actions action = new(driver);
 
                    action
-                           .MoveToElement(image, 40, 100)
+                           .MoveToElement(image, 20, 100)
                            .Click()
                            .Perform();
 
-                   driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
+                   driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(waitingTime);
 
                    action
-                      .MoveToElement(image, 55, 100)
+                      .MoveToElement(image, 20, -120)
                       .Click()
                       .Perform();
                   
@@ -226,10 +233,15 @@ namespace PTO.Pages.Demo
                 driver.FindElement(By.XPath($"//button[@title='Stop Recording']")).Click();
                 UtilsHelper.WaitForElementIsInVisible(driver, FindType.CssSelector, loadingIcon);
 
+                // Wait until toast message close
+                UtilsHelper.WaitForElementIsInVisible(driver, FindType.CssSelector, "//*[@id='LoadingModal']");
+
+
                 float afterDrawTakeoffValue = float.Parse(driver.FindElement(By.XPath(calculatedValueSelector)).Text);
 
                 // If after = before + calculation => correct
-                if (afterDrawTakeoffValue == beforeDrawTakeoffValue + calculatedValue)
+                float router = (float)Math.Round(beforeDrawTakeoffValue + calculatedValue, 2);
+                if (afterDrawTakeoffValue == router)
                 {
                     ExtentReportsHelper.LogPassAndCap(driver, "<font color='green'><b>Calculation is CORRECT</font>");
                 }

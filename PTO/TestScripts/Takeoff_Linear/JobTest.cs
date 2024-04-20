@@ -11,9 +11,8 @@ namespace PTO.TestScripts.Takeoff_Linear
     public class JobTest : BaseTestScript
     {
         private DemoPage demo;
-
         private IWebDriver driverTest;
-        private const string FIREFOX = "FireFox";
+
         private const string JOB_NUMBER = "290224";
 
         public override void SetupTestSectionName()

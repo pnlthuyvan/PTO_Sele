@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using PTO.Base;
 using PTO.Constants;
@@ -12,23 +13,41 @@ namespace PTO.Utilities
         public static log4net.ILog Log;
         public static string log_prefix => $"[{BaseValues.AppName} v{BaseValues.Version}] :";
         private static string cached_style;
-        //protected FindType FindType { get; private set; }
 
         public static void NavigateToLoginPage(IWebDriver driver, string url)
         {
             driver.Navigate().GoToUrl(url);
         }
 
+        #region "Click Hover"
+
+        /// <summary>
+        /// Hover mouse on the element
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="isCaptured"></param>
+        public static void HoverMouse(IWebDriver driver, IWebElement control, bool isCaptured = true)
+        {
+            ActionWithTryCatch(() =>
+            {
+                string text = control.Text == "" ? control.GetAttribute("value") : control.Text;
+                Actions action = new Actions(driver);
+                action.MoveToElement(control).Perform();
+                if (isCaptured)
+                    ExtentReportsHelper.LogInformation(CaptureScreen(driver, control), $"Hovered on web element '<font color='green'><b><i>{text}</i></b></font>'");
+            });
+        }
+        #endregion
+
+        #region "Wait"
+
         public static void WaitPageLoad(IWebDriver driver)
         {
             //Wait for the page to load completely using JavaScript
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.Until(driver => ((IJavaScriptExecutor)driver).ExecuteScript("return document.readyState").Equals("complete"));
-
             System.Threading.Thread.Sleep(1000);
         }
-
-        /********************************************** Wait method **********************************************/
 
         /// <summary>
         /// Wait until getting the element.
@@ -127,42 +146,9 @@ namespace PTO.Utilities
             }
 
         }
+        #endregion
 
-        /********************************************** Try catch method **********************************************/
-
-        /// <summary>
-        /// Handle Try catch methods
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        /// <exception cref="StaleElementReferenceException"></exception>
-        /// <exception cref="ElementNotInteractableException"></exception>
-        /// <exception cref="NoSuchElementException"></exception>
-        public static TResult ReturnActionResultWithTryCatch<TResult>(Func<TResult> action)
-        {
-            try
-            {
-                return action();
-            }
-            catch (StaleElementReferenceException e)
-            {
-                //Log.Error($"The element [{FindType:g}|{ValueToFind}] is out of date - " + e.Message);
-                throw new StaleElementReferenceException("The element is out of date");
-            }
-            catch (ElementNotInteractableException e)
-            {
-                //Log.Error($"The element [{FindType:g}|{ValueToFind}] is not interactable - " + e.Message);
-                throw new ElementNotInteractableException("The element is not interactable (hidden or disabled...)");
-            }
-            catch (NoSuchElementException e)
-            {
-                //UtilsHelper.debug_output($"The element [{FindType:g}|{ValueToFind}] does not exist on DOM - " + e.Message);
-                throw new NoSuchElementException("The element could not be found");
-            }
-        }
-
-        /********************************************** Log method **********************************************/
+        #region "Log"
 
         /// <summary>
         /// General debugging output using a premade message.
@@ -189,8 +175,9 @@ namespace PTO.Utilities
             if (Log == null)
                 Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         }
+        #endregion
 
-        /********************************************** Path method **********************************************/
+        #region "Path"
 
         /// <summary>
         /// Handle debug out put message with input is path
@@ -203,7 +190,9 @@ namespace PTO.Utilities
             return (message.Length > 28) ? message[..24].TrimEnd() + ".." : message;
         }
 
-        /********************************************** Capture screen method **********************************************/
+        #endregion
+
+        #region "Capture screen"
 
         /// <summary>
         /// Capture screen and highlight the control, if does not have the control, the system will capture current screen
@@ -230,7 +219,10 @@ namespace PTO.Utilities
             return finalpth;
         }
 
-        /********************************************** 2light method **********************************************/
+        #endregion
+
+        #region "2light"
+
         /// <summary>
         /// Highlight function that supported for capturing function
         /// </summary>
@@ -282,5 +274,89 @@ namespace PTO.Utilities
                 }
             }
         }
+        #endregion
+
+        #region "JAVA SCRIPT"
+
+        /// <summary>
+        /// Get result of a JavaScript query in the form of Object
+        /// </summary>
+        public static object? GetJavaScriptResult(IWebDriver driver, string script)
+        {
+            //UtilsHelper.debug_output($"Executing expression by JavaScript...");
+
+            try
+            {
+                IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
+                return executor.ExecuteScript(script);
+            }
+            catch (Exception ex)
+            {
+                UtilsHelper.DebugOutput($"Encountered exception while executing JavaScript '{script}' - Exception: ->\n{ex.StackTrace}");
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region "Try catch"
+
+        /// <summary>
+        /// Handle Try catch methods
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        /// <exception cref="StaleElementReferenceException"></exception>
+        /// <exception cref="ElementNotInteractableException"></exception>
+        /// <exception cref="NoSuchElementException"></exception>
+        public static TResult ReturnActionResultWithTryCatch<TResult>(Func<TResult> action)
+        {
+            try
+            {
+                return action();
+            }
+            catch (StaleElementReferenceException e)
+            {
+                //Log.Error($"The element [{FindType:g}|{ValueToFind}] is out of date - " + e.Message);
+                throw new StaleElementReferenceException("The element is out of date");
+            }
+            catch (ElementNotInteractableException e)
+            {
+                //Log.Error($"The element [{FindType:g}|{ValueToFind}] is not interactable - " + e.Message);
+                throw new ElementNotInteractableException("The element is not interactable (hidden or disabled...)");
+            }
+            catch (NoSuchElementException e)
+            {
+                //UtilsHelper.debug_output($"The element [{FindType:g}|{ValueToFind}] does not exist on DOM - " + e.Message);
+                throw new NoSuchElementException("The element could not be found");
+            }
+        }
+
+
+        public static void ActionWithTryCatch(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (StaleElementReferenceException e)
+            {
+                Log.Error($"The web element is out of date - Exception: ->\n" + e.StackTrace);
+                // throw new StaleElementReferenceException("The element is out of date");
+            }
+            catch (ElementNotInteractableException e)
+            {
+                Log.Error($"Uninteractable web element - Exception: ->\n" + e.StackTrace);
+                // throw new ElementNotInteractableException("Uninteractable web element (hidden, disabled, or unusable...)");
+            }
+            catch (NoSuchElementException e)
+            {
+                Log.Warn($"The web element does not exist on the DOM - Exception: ->\n" + e.StackTrace);
+                // throw new NoSuchElementException("The element could not be found");
+            }
+        }
+        #endregion
+
     }
 }
