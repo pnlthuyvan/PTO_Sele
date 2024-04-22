@@ -10,6 +10,7 @@ namespace PTO.Base
     public class BasePage(IWebDriver driver)
     {
         protected IWebDriver driverTest = driver;
+
         protected FindElementHelper element_finder => FindElementHelper.Instance(driverTest);
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -48,7 +49,7 @@ namespace PTO.Base
                 {
                     //UtilsHelper.test_output($"Waiting for JQuery & page to load within {timeout_seconds} seconds...");
 
-                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout_seconds));
+                    var wait = new WebDriverWait(driverTest, TimeSpan.FromSeconds(timeout_seconds));
                     wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException), typeof(StaleElementReferenceException), typeof(NoSuchElementException), typeof(System.Net.WebException));
                     bool page_state = wait.Until((d) =>
                     {
@@ -97,7 +98,7 @@ namespace PTO.Base
             catch (UnhandledAlertException e)
             {
                 Log.Error($"Failed to wait for JQuery within {timeout_seconds} seconds - Exception: ->\n{e.StackTrace}");
-                throw new UnhandledAlertException(string.Format("An unexpected alert is displayed on your page, the test is stopped. The alert is displayed with the message: \"{0}\"", driver.SwitchTo().Alert().Text));
+                throw new UnhandledAlertException(string.Format("An unexpected alert is displayed on your page, the test is stopped. The alert is displayed with the message: \"{0}\"", driverTest.SwitchTo().Alert().Text));
             }
             catch (Exception e)
             {
@@ -133,7 +134,7 @@ namespace PTO.Base
 
                 //Waiting for the page to load within {timeout_seconds} seconds...
 
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout_seconds));
+                var wait = new WebDriverWait(driverTest, TimeSpan.FromSeconds(timeout_seconds));
                 ready_state = wait.Until((x) => { return bool.TryParse(UtilsHelper.GetJavaScriptResult(driverTest, js_document_state).ToString(), out _); });
             }
             catch (WebDriverTimeoutException e)
@@ -144,6 +145,22 @@ namespace PTO.Base
             {
                 Log.Error($"The chrome browser closed unexpectedly - Exception: ->\n{e.StackTrace}");
             }
+        }
+
+        #endregion
+
+        #region "Loading Icon"
+
+        /// <summary>
+        /// Wait until the loadin icon invisible during 60s
+        /// </summary>
+        /// <returns></returns>
+        public bool WaitLoadingIconHide(int waitTime = 60)
+        {
+            //string loadingIcon = "//*[@id='LoadingModal' and contains(@style, 'display: block')]";
+            string loadingIcon = "//*[@id='LoadingModal']";
+            CommonElement ele = new(driverTest, FindType.XPath, loadingIcon);
+            return ele.WaitForElementIsInVisible(waitTime, false);
         }
 
         #endregion
@@ -196,8 +213,8 @@ namespace PTO.Base
 
                 // Click selected sub menu
                 string subMenuSelector = $"//a[@class='active']/span[contains(text(),'{selectedSubMenu}')]";
-                UtilsHelper.WaitForElementIsVisible(driverTest, FindType.XPath, subMenuSelector, 5);
-                IWebElement itemNeedToClick = driver.FindElement(By.XPath(subMenuSelector));
+                UtilsHelper.WaitForElementIsVisible(driverTest, FindType.XPath, subMenuSelector);
+                IWebElement itemNeedToClick = driverTest.FindElement(By.XPath(subMenuSelector));
 
                 if (isCaptured)
                     ExtentReportsHelper.LogInformation(UtilsHelper.CaptureScreen(driverTest, itemNeedToClick), $"Click item <font color='green'><b><i>{selectedSubMenu}</i></b></font> on left menu.");

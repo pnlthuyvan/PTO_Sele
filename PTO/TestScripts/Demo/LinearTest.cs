@@ -4,21 +4,22 @@ using PTO.Utilities;
 using PTO.Pages.Demo;
 using Pipeline.Common.Constants;
 
-namespace PTO.TestScripts.Takeoff_Count
+namespace PTO.TestScripts.Demo
 {
     [TestFixture]
     [Parallelizable]
-    public class ZoomTest : BaseTestScript
+    public class LinearTest : BaseTestScript
     {
         private DemoPage demo;
         private IWebDriver driverTest;
 
         private const string JOB_NUMBER = "290224";
         private const string SHEET = "Sheet_1.2";
+        private const string MEASUREMENT = "BV_KM_2_Import";
 
         public override void SetupTestSectionName()
         {
-            SetupTestSectionName(Sections.TAKEOFF_COUNT);
+            SetupTestSectionName(Sections.TAKEOFF_LINEAR);
         }
 
         [SetUp]
@@ -36,12 +37,15 @@ namespace PTO.TestScripts.Takeoff_Count
         }
 
 
-        [Test, Category($"{Sections.TAKEOFF_COUNT}")]
-        public void TestMethod_Zoom_Draw()
+        [Test, Category($"{Sections.TAKEOFF_LINEAR}")]
+        public void TestMethod_Draw_Linear()
         {
             demo.OpenJob(JOB_NUMBER);
             demo.SelectSheet(SHEET);
+
             demo.ZoomInOut();
+            demo.SelectKeyMeasure(MEASUREMENT);
+            demo.Linear();
         }
 
         [TearDown]

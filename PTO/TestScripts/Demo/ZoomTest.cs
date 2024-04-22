@@ -1,26 +1,24 @@
 ﻿using OpenQA.Selenium;
 using PTO.Base;
 using PTO.Utilities;
-using PTO.Pages.LoginPage;
 using PTO.Pages.Demo;
 using Pipeline.Common.Constants;
 
-namespace PTO.TestScripts.Takeoff_Linear
+namespace PTO.TestScripts.Demo
 {
     [TestFixture]
     [Parallelizable]
-    public class SheetTest : BaseTestScript
+    public class ZoomTest : BaseTestScript
     {
         private DemoPage demo;
         private IWebDriver driverTest;
 
         private const string JOB_NUMBER = "290224";
         private const string SHEET = "Sheet_1.2";
-        private const string MEASUREMENT = "BV_KM_2_Import";
 
         public override void SetupTestSectionName()
         {
-            SetupTestSectionName(Sections.TAKEOFF_LINEAR);
+            SetupTestSectionName(Sections.TAKEOFF_COUNT);
         }
 
         [SetUp]
@@ -37,12 +35,13 @@ namespace PTO.TestScripts.Takeoff_Linear
             demo = new DemoPage(driverTest);
         }
 
-        [Test, Category($"{Sections.TAKEOFF_LINEAR}")]
-        public void TestMethod_Select_KeyMeasure()
+
+        [Test, Category($"{Sections.TAKEOFF_COUNT}")]
+        public void TestMethod_Zoom_Draw()
         {
             demo.OpenJob(JOB_NUMBER);
             demo.SelectSheet(SHEET);
-            demo.SelectKeyMeasure(MEASUREMENT);
+            demo.ZoomInOut();
         }
 
         [TearDown]

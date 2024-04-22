@@ -85,7 +85,15 @@ namespace PTO.Base
         /// </summary>
         public static int DebugPort => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.DebugPort));
 
+        /// <summary>
+        /// The limit for waiting until the page loads successfully
+        /// </summary>
         public static int PageLoadTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.PageLoadTimeOut));
+
+        /// <summary>
+        /// The limit for waiting until being able to successfully retrieve an element
+        /// </summary>
+        public static int WaitingTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.WaitingTimeOut));
 
 
         /// <summary>

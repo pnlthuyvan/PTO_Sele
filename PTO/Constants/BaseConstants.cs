@@ -20,6 +20,7 @@
         public const string IsCaptureEverything = "CaptureEachStep";
         public const string ReportLocation = "ReportSaveLocation";
         public const string ReportCounter = "BuildCounter";
+        public const string WaitingTimeOut = "WaitingTimeouts";
         public const string PageLoadTimeOut = "PageloadTimeouts";
         public const string Headless = "HeadlessBrowser";
         public const string DebugMode = "DebugMode";

@@ -21,6 +21,11 @@ namespace PTO.Utilities
         [ThreadStatic]
         private static ExtentTest _childTest;
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static ExtentTest GetTest() { return _childTest; }
+
+        #region "Create/ Update test report"
+
         public static bool IsParentTestNull
         {
             get
@@ -107,7 +112,12 @@ namespace PTO.Utilities
             return _childTest;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
+
+        #endregion
+
+        #region "Log report only[MethodImpl(MethodImplOptions.Synchronized)]
+
         public static ExtentTest LogFail(string pathImg = null, string details = "LOG", string styled_report_msg = null)
         {
             string msg = $"    *** FAILURE ***  ==  {details}";
@@ -183,6 +193,10 @@ namespace PTO.Utilities
             System.Threading.Thread.Sleep(100);
             return _childTest;
         }
+
+        #endregion
+
+        #region "Log report and capture"
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static ExtentTest LogFailAndCap(IWebDriver driver, string details)
@@ -294,6 +308,15 @@ namespace PTO.Utilities
             return _childTest;
         }
 
+        #endregion
+
+        #region "Screenshot"
+
+        /// <summary>
+        /// Take screenshot and log
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="img"></param>
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void LogScreenshot(string info, string img)
         {
@@ -305,13 +328,12 @@ namespace PTO.Utilities
             _childTest.Info(info, MediaEntityBuilder.CreateScreenCaptureFromBase64String(img).Build());
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest GetTest()
-        {
-            log.Debug($"Get child test.");
-            return _childTest;
-        }
+        #endregion
 
+        #region "Verify Child Test"
+        /// <summary>
+        /// Verify test case in a section is null or not
+        /// </summary>
         public static bool IsChildTestNull
         {
             get
@@ -328,5 +350,7 @@ namespace PTO.Utilities
                 }
             }
         }
+        #endregion
+
     }
 }

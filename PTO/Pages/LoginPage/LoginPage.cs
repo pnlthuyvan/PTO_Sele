@@ -8,7 +8,7 @@ namespace PTO.Pages.LoginPage
 {
     public class LoginPage(IWebDriver driver) : BasePage (driver)
     {
-        private IWebDriver driverTest = driver;
+        private new readonly IWebDriver driverTest = driver;
 
         public void SignIn()
         {
@@ -140,7 +140,7 @@ namespace PTO.Pages.LoginPage
 
                 // Wait until the confirm dialog display
                 string confirm_Xpath = "//*[@id='Confirm']";
-                UtilsHelper.WaitForElementIsVisible(driverTest, FindType.XPath, confirm_Xpath, 1000);
+                UtilsHelper.WaitForElementIsVisible(driverTest, FindType.XPath, confirm_Xpath);
 
                 var confirmLogOutButton = driverTest.FindElement(By.XPath(confirm_Xpath));
                 if (confirmLogOutButton.Displayed is false)
@@ -152,7 +152,7 @@ namespace PTO.Pages.LoginPage
                 UtilsHelper.WaitPageLoad(driverTest);
 
                 // Wait until the login page display
-                UtilsHelper.WaitForElementIsVisible(driverTest, FindType.XPath, "//*[@id='formLogin']", 1000);
+                UtilsHelper.WaitForElementIsVisible(driverTest, FindType.XPath, "//*[@id='formLogin']");
                 driverTest.Close();
             }
             catch (Exception exception)

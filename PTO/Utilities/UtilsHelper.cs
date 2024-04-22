@@ -4,6 +4,7 @@ using OpenQA.Selenium.Support.UI;
 using PTO.Base;
 using PTO.Constants;
 using PTO.Manager;
+using SeleniumExtras.WaitHelpers;
 using System.Diagnostics;
 
 namespace PTO.Utilities
@@ -12,6 +13,9 @@ namespace PTO.Utilities
     {
         public static log4net.ILog Log;
         public static string log_prefix => $"[{BaseValues.AppName} v{BaseValues.Version}] :";
+        public static bool debug => BaseValues.DebugMode;
+        private static int waitingTimeOut => BaseValues.WaitingTimeOut;
+
         private static string cached_style;
 
         public static void NavigateToLoginPage(IWebDriver driver, string url)
@@ -58,13 +62,13 @@ namespace PTO.Utilities
         /// <param name="timeout"></param>
         /// <param name="captureAndLog"></param>
         /// <returns></returns>
-        public static bool WaitForElementIsVisible(IWebDriver driver, FindType FindType, string ValueToFind, int timeout = 10, bool captureAndLog = true)
+        public static bool WaitForElementIsVisible(IWebDriver driver, FindType FindType, string ValueToFind, bool captureAndLog = true)
         {
-            DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to become visible within {timeout} seconds...");
+            DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to become visible within {waitingTimeOut} seconds...");
 
             IWebElement element;
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
+            WebDriverWait wait = new(driver, TimeSpan.FromSeconds(waitingTimeOut));
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException), typeof(WebDriverTimeoutException), typeof(InvalidSelectorException));
 
             try
@@ -108,11 +112,11 @@ namespace PTO.Utilities
         /// <param name="timeout"></param>
         /// <param name="captureAndLog"></param>
         /// <returns></returns>
-        public static bool WaitForElementIsInVisible(IWebDriver driver, FindType FindType, string ValueToFind, int timeout = 20, bool captureAndLog = true)
+        public static bool WaitForElementIsInVisible(IWebDriver driver, FindType FindType, string ValueToFind, bool captureAndLog = true)
         {
-            DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to hide within {timeout} seconds...");
+            DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to hide within {waitingTimeOut} seconds...");
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(waitingTimeOut));
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException), typeof(WebDriverTimeoutException));
             try
             {
@@ -148,6 +152,49 @@ namespace PTO.Utilities
         }
         #endregion
 
+        #region "Focus"
+        /// <summary>
+        /// Use this to reset WebDriver's focus for the currently focused context back to the parent Window.
+        /// Very useful for dealing with Telerik inputs, inline input elements, and autocomplete enabled inputs, among other interactables...
+        /// </summary>
+        public static void ResetCurrentWindowFocus(IWebDriver driver)
+        {
+            if (driver != null)
+            {
+                try
+                {
+                    //test_output("Attempting to reset focus using the current window title...");
+
+                    driver.SwitchTo().Window(driver.CurrentWindowHandle);
+
+                    System.Threading.Thread.Sleep(25);
+                }
+                catch (NoSuchWindowException nsw_ex)
+                {
+                    test_output($"No Window exists with the title '{driver.Title}' - Exception: ->\n{nsw_ex.StackTrace}");
+
+                    string last_window_handle = "get_last_handle_failure";
+                    try
+                    {
+                        test_output("Attempting to reset focus using last window handle...");
+
+                        last_window_handle = driver.WindowHandles.Last();
+
+                        driver.SwitchTo().Window(last_window_handle);
+
+                        System.Threading.Thread.Sleep(25);
+                    }
+                    catch (Exception ex)
+                    {
+                        test_output($"No Window exists with the handle '{driver.WindowHandles.Last()}' - Exception: ->\n{ex.StackTrace}");
+                    }
+                }
+
+                //test_output("Successfully reset focus of current window.");
+            }
+        }
+        #endregion
+
         #region "Log"
 
         /// <summary>
@@ -161,7 +208,7 @@ namespace PTO.Utilities
         {
             System.Diagnostics.Debug.WriteLine($"{premade_msg}", log_prefix);
             if (TestEnvironment.active_status && add_to_report)
-                ExtentReportsHelper.LogInformationAndCap(null, premade_msg);
+                ExtentReportsHelper.LogInformation(null, premade_msg);
             else Debug.WriteLine($"{premade_msg}", log_prefix);
 
             if (!TestEnvironment.active_status && Log != null) Log.Debug($"{log_prefix}: {premade_msg}");
@@ -172,8 +219,18 @@ namespace PTO.Utilities
         /// </summary>
         internal static void InitLog()
         {
-            if (Log == null)
-                Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            Log ??= log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        }
+
+        /// <summary>
+        /// General debugging output using a premade message.
+        /// Output is delivered to the debug console and logged to both the ExtentReports and Log files.
+        /// test_output is intended to be used for debugging the web app specific page and test script related methods.
+        /// NOTE: Requires DebugMode to be enabled in the App config file, so as to prevent the test ExtentReports from being spammed with debugging output.
+        /// </summary>
+        public static void test_output(string premade_msg, bool add_to_report = true)
+        {
+            (!debug ? new Action<string, bool>(DebugOutput) : (s, b) => { })($"{premade_msg}", add_to_report);
         }
         #endregion
 
@@ -186,7 +243,9 @@ namespace PTO.Utilities
         /// <returns></returns>
         public static string TrimArg(string message)
         {
-            if (message == null) return string.Empty;
+            if (string.IsNullOrEmpty(message)) 
+                return string.Empty;
+
             return (message.Length > 28) ? message[..24].TrimEnd() + ".." : message;
         }
 
@@ -297,6 +356,37 @@ namespace PTO.Utilities
             }
         }
 
+        public static void JavaScriptClick(IWebDriver driver, BaseControl control, bool isCaptured = true)
+        {
+            JavaScriptClick(driver, control.GetWrappedControl(), isCaptured);
+        }
+
+        /// <summary>
+        /// Click on the element by javascript
+        /// </summary>
+        /// <param name="control"></param>
+        public static void JavaScriptClick(IWebDriver driver, IWebElement control, bool isCaptured = true)
+        {
+            UtilsHelper.ResetCurrentWindowFocus(driver);
+
+            ActionWithTryCatch(() =>
+            {
+                if (control == null) return;
+
+                //Log.Debug($"Clicking on web element via JavaScript...");
+                string control_identity = control.Text == string.Empty ? control.ToString() : control.Text;
+                if (isCaptured)
+                    ExtentReportsHelper.LogInformation(CaptureScreen(driver, control), $"Moving to, focusing, and then clicking web element '<font color = 'green'><b>{control_identity}</b></font>' via JavaScript...");
+
+                IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
+                executor.ExecuteScript("arguments[0].scrollIntoView({block: 'end'});", control);
+                //System.Threading.Thread.Sleep(25);
+                //executor.ExecuteScript("arguments[0].focus();", control);
+                //System.Threading.Thread.Sleep(333);
+                executor.ExecuteScript("arguments[0].click();", control);
+            });
+        }
+
         #endregion
 
         #region "Try catch"
@@ -356,6 +446,36 @@ namespace PTO.Utilities
                 // throw new NoSuchElementException("The element could not be found");
             }
         }
+        #endregion
+
+        #region "Verify element attribute"
+
+        /// <summary>
+        /// Verify an element is enabled and displayed
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public static bool IsElementValid(IWebDriver driver, IWebElement element)
+        {
+            try
+            {
+                var wait = new DefaultWait<IWebDriver>(driver)
+                {
+                    Timeout = TimeSpan.FromSeconds(0.5),
+                    PollingInterval = TimeSpan.FromMilliseconds(100)
+                };
+                wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
+                var result = wait.Until(ExpectedConditions.ElementToBeClickable(element));
+                return (result != null);
+            }
+            catch (Exception ex)
+            {
+                Log.Info($"Element is not valid - null, disabled, or invisible - Exception: {ex.Message}");
+                Console.Write($"Element is not valid - null, disabled, or invisible - Exception: {ex.Message}");
+                return false;
+            }
+        }
+
         #endregion
 
     }

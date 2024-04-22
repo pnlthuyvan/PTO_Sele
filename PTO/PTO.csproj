@@ -48,4 +48,11 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestScripts\Post_Takeoff\" />
+    <Folder Include="TestScripts\Pre_Takeoff\Login_Logout\" />
+    <Folder Include="TestScripts\Pre_Takeoff\Landing_Page\" />
+    <Folder Include="TestScripts\Takeoff\" />
+  </ItemGroup>
+
 </Project>

@@ -4,22 +4,20 @@ using PTO.Utilities;
 using PTO.Pages.Demo;
 using Pipeline.Common.Constants;
 
-namespace PTO.TestScripts.Takeoff_Area
+namespace PTO.TestScripts.Demo
 {
     [TestFixture]
-    //[Parallelizable]
-    public class ReportTest : BaseTestScript
+    [Parallelizable]
+    public class JobTest : BaseTestScript
     {
         private DemoPage demo;
-
-        // private IWebDriver firstDriverTest;
-        public IWebDriver driverTest;
+        private IWebDriver driverTest;
 
         private const string JOB_NUMBER = "290224";
 
         public override void SetupTestSectionName()
         {
-            SetupTestSectionName(Sections.TAKEOFF_AREA);
+            SetupTestSectionName(Sections.TAKEOFF_LINEAR);
         }
 
         [SetUp]
@@ -33,8 +31,8 @@ namespace PTO.TestScripts.Takeoff_Area
             demo = new DemoPage(driverTest);
         }
 
-        [Test, Category($"{Sections.TAKEOFF_AREA}")]
-        public void TestMethod_Report()
+        [Test, Category($"{Sections.TAKEOFF_LINEAR}")]
+        public void TestMethod_Open_Job()
         {
             demo.OpenJob(JOB_NUMBER);
         }

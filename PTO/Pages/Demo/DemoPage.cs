@@ -73,10 +73,10 @@ namespace PTO.Pages.Demo
                 var renderingXpath = "//span{text() = 'Rendering...']";
 
                 // Wait to display
-                UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, renderingXpath, waitingTime);
+                UtilsHelper.WaitForElementIsVisible(driver, FindType.XPath, renderingXpath);
 
                 // Wait to disappear
-                UtilsHelper.WaitForElementIsInVisible(driver, FindType.XPath, renderingXpath, waitingTime);
+                UtilsHelper.WaitForElementIsInVisible(driver, FindType.XPath, renderingXpath);
             }
             catch (Exception e)
             {
