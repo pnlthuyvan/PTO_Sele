@@ -13,7 +13,7 @@ namespace PTO.Controls
 
 
         /// <summary>
-        /// Click function
+        /// Click control (normal click)
         /// </summary>
         /// <param name="isCapture"></param>
         public void Click(bool isCapture = true)
@@ -21,11 +21,15 @@ namespace PTO.Controls
             UtilsHelper.ActionWithTryCatch(() =>
             {
                 if (isCapture)
-                    CaptureAndLog($"Clicking web element <font color ='green'><b><i>{GetTextOrValue()}</i></b></font>...");
+                    CaptureAndLog($"Clicking Button <font color ='green'><b><i>{GetTextOrValue()}</i></b></font>");
                 GetWrappedControl().Click();
             });
         }
 
+        /// <summary>
+        /// Click control by javascript
+        /// </summary>
+        /// <param name="isCapture"></param>
         public void ClickByJavascript(bool isCapture = true)
         {
             UtilsHelper.JavaScriptClick(driver, this, isCapture);

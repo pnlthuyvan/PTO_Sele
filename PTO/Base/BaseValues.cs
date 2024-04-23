@@ -7,7 +7,7 @@ namespace PTO.Base
 {
     public static class BaseValues
     {
-        private static readonly Lazy<ExtentReports> _lazyExtent = new Lazy<ExtentReports>(() => new ExtentReports());
+        private static readonly Lazy<ExtentReports> _lazyExtent = new(() => new ExtentReports());
 
         public static ExtentReports GetExtentReports()
         {
@@ -17,83 +17,82 @@ namespace PTO.Base
         public static IList<Cookie>? LoginCookieList { get; set; }
 
         public static IWebDriver? FirstDriverTest { get; set; }
-        public static IWebDriver? driver_section1 { get; set; }
 
         /// <summary>
         /// Read protocol from appsettings.json file
         /// </summary>
-        public static string? AppName => AppConfigUtil.GetAppSetting(BaseConstants.AppName);
+        public static string? AppName => AppConfigUtil.GetAppSetting(BaseConstants.AOO_NAME);
 
         /// <summary>
         /// Read protocol from appsettings.json file
         /// </summary>
-        public static string? Version => AppConfigUtil.GetAppSetting(BaseConstants.Version);
+        public static string? Version => AppConfigUtil.GetAppSetting(BaseConstants.VERSION);
 
 
         /// <summary>
         /// Read protocol from appsettings.json file
         /// </summary>
-        public static string? Protocol => AppConfigUtil.GetAppSetting(BaseConstants.ApplicationProtocol);
+        public static string? Protocol => AppConfigUtil.GetAppSetting(BaseConstants.APPLICATION_PROTOCOL);
 
         /// <summary>
         /// Read Tenant from appsettings.json file
         /// </summary>
-        public static string? Tenant => AppConfigUtil.GetAppSetting(BaseConstants.Tenant);
+        public static string? Tenant => AppConfigUtil.GetAppSetting(BaseConstants.TENANT);
 
         /// <summary>
         /// Read Domain from appsettings.json file
         /// </summary>
-        public static string? ApplicationDomain => AppConfigUtil.GetAppSetting(BaseConstants.ApplicationDomain);
+        public static string? ApplicationDomain => AppConfigUtil.GetAppSetting(BaseConstants.APPLICATION_DOMAIN);
 
         /// <summary>
         /// Read UserName from appsettings.json file
         /// </summary>
-        public static string? UserName => AppConfigUtil.GetAppSetting(BaseConstants.UserName);
+        public static string? UserName => AppConfigUtil.GetAppSetting(BaseConstants.USER_NAME);
 
         /// <summary>
         /// Read Password from appsettings.json file
         /// </summary>
-        public static string? Password => AppConfigUtil.GetAppSetting(BaseConstants.Password);
+        public static string? Password => AppConfigUtil.GetAppSetting(BaseConstants.PASSWORD);
 
         /// <summary>
         /// Read Report Location from appsettings.json file
         /// </summary>
-        public static string? ReportLocation => AppConfigUtil.GetAppSetting(BaseConstants.ReportLocation);
+        public static string? ReportLocation => AppConfigUtil.GetAppSetting(BaseConstants.REPORT_LOCATION);
 
         /// <summary>
         /// Read Report counter from appsettings.json file
         /// </summary>
-        public static string? ReportCounter => AppConfigUtil.GetAppSetting(BaseConstants.ReportCounter);
+        public static string? ReportCounter => AppConfigUtil.GetAppSetting(BaseConstants.REPORT_COUNTER);
 
         /// <summary>
         /// Read browser name from appsettings.json file
         /// </summary>
-        public static string? Browser => AppConfigUtil.GetAppSetting(BaseConstants.Browser);
+        public static string? Browser => AppConfigUtil.GetAppSetting(BaseConstants.BROWSER);
 
         /// <summary>
         /// Read browser headless mode from appsettings.json file
         /// </summary>
-        public static bool Headless => !string.IsNullOrEmpty(AppConfigUtil.GetAppSetting(BaseConstants.Headless)) && bool.Parse(AppConfigUtil.GetAppSetting(BaseConstants.Headless));
+        public static bool Headless => !string.IsNullOrEmpty(AppConfigUtil.GetAppSetting(BaseConstants.HEADLESS)) && bool.Parse(AppConfigUtil.GetAppSetting(BaseConstants.HEADLESS));
 
         /// <summary>
         /// Read debug mode status from appsettings.json file
         /// </summary>
-        public static bool DebugMode => !string.IsNullOrEmpty(AppConfigUtil.GetAppSetting(BaseConstants.DebugMode)) && bool.Parse(AppConfigUtil.GetAppSetting(BaseConstants.DebugMode));
+        public static bool DebugMode => !string.IsNullOrEmpty(AppConfigUtil.GetAppSetting(BaseConstants.DEBUG_MODE)) && bool.Parse(AppConfigUtil.GetAppSetting(BaseConstants.DEBUG_MODE));
 
         /// <summary>
         /// Read debug port from appsettings.json file
         /// </summary>
-        public static int DebugPort => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.DebugPort));
+        public static int DebugPort => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.DEBUG_PORT));
 
         /// <summary>
         /// The limit for waiting until the page loads successfully
         /// </summary>
-        public static int PageLoadTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.PageLoadTimeOut));
+        public static int PageLoadTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.PAGE_LOAD_TIMEOUTS));
 
         /// <summary>
         /// The limit for waiting until being able to successfully retrieve an element
         /// </summary>
-        public static int WaitingTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.WaitingTimeOut));
+        public static int WaitingTimeOut => int.Parse(AppConfigUtil.GetAppSetting(BaseConstants.WAITING_TIMEOUTS));
 
 
         /// <summary>

@@ -3,8 +3,6 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium;
 using PTO.Base;
 using PTO.Manager;
-using OpenQA.Selenium.Remote;
-using System.Linq.Expressions;
 
 namespace PTO.Utilities
 {
@@ -19,7 +17,7 @@ namespace PTO.Utilities
         public IWebDriver InitDriver(string? browser, string url)
         {
 
-            IWebDriver driver = null;
+            IWebDriver? driver = null;
             try
             {
                 switch (browser.ToLower())
@@ -52,53 +50,7 @@ namespace PTO.Utilities
             return driver;
         }
 
-
-        /*********************************** CHROME HANDLER ************************************************/
-        /// <summary>
-        /// Set up Chrome driver
-        /// </summary>
-        /// <returns></returns>
-        private static IWebDriver ConfigureChromeOptions()
-        {
-            ChromeOptions chromeOptions = new ChromeOptions();
-
-            if (BaseValues.Headless)
-            {
-                UtilsHelper.DebugOutput("Setting web driver to run using the 'headless' flag...", false);
-                chromeOptions.AddArgument("--headless=new");
-            }
-
-            if (BaseValues.DebugMode)
-            {
-                UtilsHelper.DebugOutput($"Setting web driver to debug mode on port '{BaseValues.DebugMode}'...", false);
-                chromeOptions.AddArgument($"--remote-debugging-port={BaseValues.DebugMode}");
-            }
-
-            chromeOptions.AddArgument("--disable-gpu");
-            chromeOptions.AddArgument("--disable-dev-shm-usage");
-            chromeOptions.AddArgument("--safebrowsing-disable-download-protection");
-            chromeOptions.AddUserProfilePreference("safebrowsing.enabled", "true");
-
-            return GetNewChromeDriver(chromeOptions);
-        }
-
-        /// <summary>
-        /// Init Chrome driver
-        /// </summary>
-        /// <param name="_driverConfig"></param>
-        /// <returns></returns>
-        protected static ChromeDriver GetNewChromeDriver(ChromeOptions _driverConfig)
-        {
-            UtilsHelper.DebugOutput("Generating Selenium Chrome driver...", false);
-
-            ChromeDriverService service;
-            service = ChromeDriverService.CreateDefaultService();
-
-            return new ChromeDriver(service, _driverConfig, TimeSpan.FromSeconds(BaseValues.PageLoadTimeOut));
-        }
-
-
-        /*********************************** FIREFOX HANDLER ************************************************/
+        #region "Firefox handler"
 
         /// <summary>
         /// Set up Firefox driver
@@ -137,6 +89,72 @@ namespace PTO.Utilities
 
             return new FirefoxDriver(service, _driverConfig, TimeSpan.FromSeconds(BaseValues.PageLoadTimeOut));
         }
+        #endregion
+
+        #region "Chrome handler"
+        /// <summary>
+        /// Set up Chrome driver
+        /// </summary>
+        /// <returns></returns>
+        private static IWebDriver ConfigureChromeOptions()
+        {
+            ChromeOptions chromeOptions = new ChromeOptions();
+
+            if (BaseValues.Headless)
+            {
+                UtilsHelper.DebugOutput("Setting web driver to run using the 'headless' flag...", false);
+                chromeOptions.AddArgument("--headless=new");
+            }
+
+            if (BaseValues.DebugMode)
+            {
+                UtilsHelper.DebugOutput($"Setting web driver to debug mode on port '{BaseValues.DebugMode}'...", false);
+                chromeOptions.AddArgument($"--remote-debugging-port={BaseValues.DebugMode}");
+            }
+
+            chromeOptions.AddArgument("--disable-gpu");
+            chromeOptions.AddArgument("--disable-dev-shm-usage");
+            chromeOptions.AddArgument("--safebrowsing-disable-download-protection");
+            chromeOptions.AddUserProfilePreference("safebrowsing.enabled", "true");
+
+            return GetNewChromeDriver(chromeOptions);
+        }
+
+        /// <summary>
+        /// Init Chrome driver
+        /// </summary>
+        /// <param name="driverConfig"></param>
+        /// <returns></returns>
+        protected static ChromeDriver GetNewChromeDriver(ChromeOptions driverConfig)
+        {
+            UtilsHelper.DebugOutput("Generating Selenium Chrome driver...", false);
+
+            ChromeDriverService service;
+            service = ChromeDriverService.CreateDefaultService();
+
+            return new ChromeDriver(service, driverConfig, TimeSpan.FromSeconds(BaseValues.PageLoadTimeOut));
+        }
+        #endregion
+
+        #region "Cookie handler"
+        /// <summary>
+        /// Set up Cookie for driver (run parallel)
+        /// </summary>
+        /// <param name="driverTest"></param>
+        /// <returns></returns>
+        public IWebDriver SetUpCookie(IWebDriver driverTest)
+        {
+            if (BaseValues.LoginCookieList == null)
+                return driverTest;
+
+            foreach (var cookie in BaseValues.LoginCookieList)
+            {
+                driverTest.Manage().Cookies.AddCookie(cookie);
+            }
+            driverTest.Url = BaseValues.BaseURL;
+            return driverTest;
+        }
+        #endregion
 
         /*********************************** DOWNLOAD HANDLER ************************************************/
 
@@ -156,22 +174,6 @@ namespace PTO.Utilities
             }
         */
 
-        /// <summary>
-        /// Set up Cookie for driver (run parallel)
-        /// </summary>
-        /// <param name="driverTest"></param>
-        /// <returns></returns>
-        public IWebDriver SetUpCookie(IWebDriver driverTest)
-        {
-            if(BaseValues.LoginCookieList == null)
-                return driverTest;
 
-            foreach (var cookie in BaseValues.LoginCookieList)
-            {
-                driverTest.Manage().Cookies.AddCookie(cookie);
-            }
-            driverTest.Url = BaseValues.BaseURL;
-            return driverTest;
-        }
     }
 }

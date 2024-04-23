@@ -13,9 +13,9 @@ namespace PTO.Manager
 {
     public abstract class TestEnvironment
     {
-        public static  ILog Log;
+        public static ILog Log;
         public static bool active_status = false;
-        private static ExtentReports extent = BaseValues.GetExtentReports();
+        private static readonly ExtentReports extent = BaseValues.GetExtentReports();
 
         /// <summary>
         /// Get All cookies (token) to sign in
@@ -63,7 +63,7 @@ namespace PTO.Manager
             }
             catch (Exception e)
             {
-
+                UtilsHelper.test_output($"Failed to load json config file for extent report. Exception: {e}");
             }
 
             UtilsHelper.InitLog();
@@ -75,10 +75,7 @@ namespace PTO.Manager
         /// </summary>
         protected static void WriteReportAndDisposeDriver(IWebDriver driver)
         {
-            if (driver == null)
-            {
-                return;
-            }
+            if (driver == null) return;
 
             try
             {

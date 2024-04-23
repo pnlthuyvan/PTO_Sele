@@ -2,29 +2,38 @@
 {
     public class BaseConstants
     {
-        //----------------------------Configuration-----------------------------
+        #region "Toast Message"
+        public const string APP_PIPELINE_TAKEOFF = "Pipeline Takeoff";
+        #endregion
 
-        public const string AppName = "AppName";
-        public const string Version = "Version";
-        public const string Browser = "Browser";
+        #region "Configuration"
 
-        public const string ApplicationProtocol = "ApplicationProtocol";
-        public const string ApplicationDomain = "ApplicationDomain";
-        public const string Tenant = "Tenant";
+        public const string AOO_NAME = "AppName";
+        public const string VERSION = "Version";
+        public const string BROWSER = "Browser";
 
-        public const string UserName = "UserName";
-        public const string Password = "Password";
+        public const string APPLICATION_PROTOCOL = "ApplicationProtocol";
+        public const string APPLICATION_DOMAIN = "ApplicationDomain";
+        public const string TENANT = "Tenant";
 
-        public const string PageloadTimeouts = "PageloadTimeouts";
-        public const string SaveImageAsBase64 = "SaveImageAsBase64";
-        public const string IsCaptureEverything = "CaptureEachStep";
-        public const string ReportLocation = "ReportSaveLocation";
-        public const string ReportCounter = "BuildCounter";
-        public const string WaitingTimeOut = "WaitingTimeouts";
-        public const string PageLoadTimeOut = "PageloadTimeouts";
-        public const string Headless = "HeadlessBrowser";
-        public const string DebugMode = "DebugMode";
-        public const string DebugPort = "DebugPort";
+        public const string USER_NAME = "UserName";
+        public const string PASSWORD = "Password";
 
+        public const string PAGE_LOAD_TIMEOUTS = "PageloadTimeouts";
+        public const string REPORT_LOCATION = "ReportSaveLocation";
+        public const string REPORT_COUNTER = "BuildCounter";
+        public const string WAITING_TIMEOUTS = "WaitingTimeouts";
+        public const string HEADLESS = "HeadlessBrowser";
+        public const string DEBUG_MODE = "DebugMode";
+        public const string DEBUG_PORT = "DebugPort";
+
+        #endregion
+
+        #region "Toast Message"
+
+        public const string TOAST_MESSAGE_TITLE = "Title";
+        public const string TOAST_MESSAGE_CONTENT = "Content";
+
+        #endregion
     }
 }

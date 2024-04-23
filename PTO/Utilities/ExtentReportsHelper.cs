@@ -10,16 +10,16 @@ namespace PTO.Utilities
         private readonly static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [ThreadStatic]
-        private static ExtentTest _parentTest;
+        private static ExtentTest? _parentTest;
 
         [ThreadStatic]
-        private static List<ExtentTest> _listOfParentsTest;
+        private static List<ExtentTest>? _listOfParentsTest;
 
         [ThreadStatic]
-        private static List<ExtentTest> _listOfChildTest;
+        private static List<ExtentTest>? _listOfChildTest;
 
         [ThreadStatic]
-        private static ExtentTest _childTest;
+        private static ExtentTest? _childTest;
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static ExtentTest GetTest() { return _childTest; }
@@ -116,12 +116,11 @@ namespace PTO.Utilities
 
         #endregion
 
-        #region "Log report only[MethodImpl(MethodImplOptions.Synchronized)]
+        #region "Log report and capture control only]
 
-        public static ExtentTest LogFail(string pathImg = null, string details = "LOG", string styled_report_msg = null)
+        public static ExtentTest LogFail(string details = "LOG", string? pathImg = null)
         {
             string msg = $"    *** FAILURE ***  ==  {details}";
-            string report_msg = (styled_report_msg == null) ? details : styled_report_msg;
 
             System.Diagnostics.Debug.WriteLine($"{msg}", UtilsHelper.log_prefix);
             log.Debug(msg);
@@ -129,17 +128,16 @@ namespace PTO.Utilities
             if (IsChildTestNull) return null;
 
             if (pathImg != null)
-                _childTest = _childTest.Fail(report_msg, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
+                _childTest = _childTest.Fail(details, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
             else
-                _childTest = _childTest.Fail(report_msg);
+                _childTest = _childTest.Fail(details);
             return _childTest;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogWarning(string pathImg = null, string details = "LOG", string styled_report_msg = null)
+        public static ExtentTest LogWarning(string details = "LOG", string? pathImg = null)
         {
             string msg = $"    *** WARNING ***  ==  {details}";
-            string report_msg = (styled_report_msg == null) ? details : styled_report_msg;
 
             System.Diagnostics.Debug.WriteLine($"{msg}", UtilsHelper.log_prefix);
             log.Debug(msg);
@@ -147,17 +145,15 @@ namespace PTO.Utilities
             if (IsChildTestNull) return null;
 
             if (pathImg != null)
-                _childTest = _childTest.Warning(report_msg, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
+                _childTest = _childTest.Warning(details, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
             else
-                _childTest = _childTest.Warning(report_msg);
+                _childTest = _childTest.Warning(details);
             return _childTest;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogInformation(string pathImg = null, string details = "LOG", string styled_report_msg = null)
+        public static ExtentTest LogInformation(string details = "LOG INFO", string? pathImg = null)
         {
-            string report_msg = (styled_report_msg == null) ? details : styled_report_msg;
-
             if (details != string.Empty)
             {
                 System.Diagnostics.Debug.WriteLine($"{details}", UtilsHelper.log_prefix);
@@ -167,18 +163,18 @@ namespace PTO.Utilities
             if (IsChildTestNull) return null;
 
             if (pathImg is null)
-                _childTest = _childTest.Info(report_msg);
+                _childTest = _childTest.Info(details);
             else
-                _childTest = _childTest.Info(report_msg, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
+                _childTest = _childTest.Info(details, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
+
             System.Threading.Thread.Sleep(100);
             return _childTest;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogPass(string pathImg = null, string details = "LOG", string styled_report_msg = null)
+        public static ExtentTest LogPass( string details = "LOG", string? pathImg = null)
         {
             string msg = $"    *** PASSED ***  ==  {details}";
-            string report_msg = (styled_report_msg == null) ? details : styled_report_msg;
 
             System.Diagnostics.Debug.WriteLine($"{msg}", UtilsHelper.log_prefix);
 
@@ -187,19 +183,19 @@ namespace PTO.Utilities
             if (IsChildTestNull) return null;
 
             if (pathImg is null)
-                _childTest = _childTest.Pass(report_msg);
+                _childTest = _childTest.Pass(details);
             else
-                _childTest = _childTest.Pass(report_msg, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
+                _childTest = _childTest.Pass(details, MediaEntityBuilder.CreateScreenCaptureFromPath(pathImg).Build());
             System.Threading.Thread.Sleep(100);
             return _childTest;
         }
 
         #endregion
 
-        #region "Log report and capture"
+        #region "Log report and capture WHOLE screen"
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogFailAndCap(IWebDriver driver, string details)
+        public static ExtentTest LogFailAndCaptureFullScreen(IWebDriver driver, string details)
         {
             string msg = $"    *** FAILURE ***  ==  {details}";
             System.Diagnostics.Debug.WriteLine(msg, UtilsHelper.log_prefix);
@@ -227,7 +223,7 @@ namespace PTO.Utilities
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogWarning(IWebDriver driver, string details)
+        public static ExtentTest LogWarningAndCaptureFullScreen(IWebDriver driver, string details)
         {
             string msg = $"    *** WARNING ***  ==  {details}";
             System.Diagnostics.Debug.WriteLine($"{msg}", UtilsHelper.log_prefix);
@@ -255,7 +251,7 @@ namespace PTO.Utilities
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogInformationAndCap(IWebDriver driver, string details)
+        public static ExtentTest LogInfoAndCaptureFullScreen(IWebDriver driver, string details)
         {
             System.Diagnostics.Debug.WriteLine($"{details}", UtilsHelper.log_prefix);
             log.Debug($"{details}");
@@ -281,7 +277,7 @@ namespace PTO.Utilities
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogPassAndCap(IWebDriver driver, string details)
+        public static ExtentTest LogPassAndCaptureFullScreen(IWebDriver driver, string details)
         {
             string msg = $"    *** PASSED ***  ==  {details}";
             System.Diagnostics.Debug.WriteLine($"{msg}", UtilsHelper.log_prefix);

@@ -11,6 +11,11 @@ namespace PTO.Controls
         public TextBox(IWebDriver driverTest) : base(driverTest) { driver = driverTest; }
         public TextBox(IWebDriver driverTest, FindType findType, string valueToFind) : base(driverTest, findType, valueToFind) { }
 
+        /// <summary>
+        /// Set value to textbox
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="isCaptured"></param>
         public void SendKeys(string value, bool isCaptured = true)
         {
             UtilsHelper.ActionWithTryCatch(() =>

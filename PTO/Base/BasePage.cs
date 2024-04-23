@@ -11,7 +11,7 @@ namespace PTO.Base
     {
         protected IWebDriver driverTest = driver;
 
-        protected FindElementHelper element_finder => FindElementHelper.Instance(driverTest);
+        protected FindElementHelper ElementFinder => FindElementHelper.Instance(driverTest);
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region "PageLoad"
@@ -20,7 +20,7 @@ namespace PTO.Base
         {
             bool.TryParse(UtilsHelper.GetJavaScriptResult(driverTest, "return (document.readyState == 'complete');").ToString(), out bool document_state);
             bool.TryParse(UtilsHelper.GetJavaScriptResult(driverTest, "return (typeof jQuery != 'undefined');").ToString(), out bool jquery_exists);
-            
+
             bool jquery_inactive = true;
             if (jquery_exists)
                 jquery_inactive = bool.TryParse(UtilsHelper.GetJavaScriptResult(driverTest, "return (jQuery.active == 0);").ToString(), out _);
@@ -36,8 +36,6 @@ namespace PTO.Base
         {
             bool jquery_page_init_state = GetJQueryPageInfo();
 
-            //UtilsHelper.test_output("jQueryPage.init_state", jquery_page_init_state.ToString());
-
             if (timeout_seconds != BaseValues.PageLoadTimeOut) timeout_seconds = BaseValues.PageLoadTimeOut;
             try
             {
@@ -47,8 +45,6 @@ namespace PTO.Base
                 }
                 else
                 {
-                    //UtilsHelper.test_output($"Waiting for JQuery & page to load within {timeout_seconds} seconds...");
-
                     var wait = new WebDriverWait(driverTest, TimeSpan.FromSeconds(timeout_seconds));
                     wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException), typeof(StaleElementReferenceException), typeof(NoSuchElementException), typeof(System.Net.WebException));
                     bool page_state = wait.Until((d) =>
@@ -104,10 +100,6 @@ namespace PTO.Base
             {
                 Log.Error($"Failed to wait for JQuery within {timeout_seconds} seconds - Exception: ->\n{e.StackTrace}");
             }
-            finally
-            {
-                //Output page info here if debugging
-            }
         }
 
         /// <summary>
@@ -155,18 +147,20 @@ namespace PTO.Base
         /// Wait until the loadin icon invisible during 60s
         /// </summary>
         /// <returns></returns>
-        public bool WaitLoadingIconHide(int waitTime = 60)
+        public bool WaitLoadingIconHide()
         {
-            //string loadingIcon = "//*[@id='LoadingModal' and contains(@style, 'display: block')]";
             string loadingIcon = "//*[@id='LoadingModal']";
             CommonElement ele = new(driverTest, FindType.XPath, loadingIcon);
-            return ele.WaitForElementIsInVisible(waitTime, false);
+            return ele.WaitForElementIsInVisible();
         }
 
         #endregion
 
         #region "Common actions"
 
+        /// <summary>
+        /// Get title of current page throgh driver
+        /// </summary>
         public string Title
         {
             get
@@ -176,6 +170,9 @@ namespace PTO.Base
             }
         }
 
+        /// <summary>
+        /// Refresh current page through driver
+        /// </summary>
         public void RefreshPage()
         {
             driverTest.Navigate().Refresh();
@@ -186,21 +183,36 @@ namespace PTO.Base
         /// </summary>
         public static void RefreshAsUser()
         {
-            InputSimulator sim = new InputSimulator();
+            InputSimulator sim = new();
             sim.Keyboard.KeyPress(WindowsInput.Native.VirtualKeyCode.F5);
         }
 
-        public bool WaitForLoadingAnimation(int wait_time = 10)
+        /// <summary>
+        /// Wait for loading icon displays and closes
+        /// </summary>
+        /// <returns></returns>
+        public bool WaitForLoadingAnimation()
         {
             string loadingIcon = "//*[@id='LoadingModal']";
-            CommonElement ele = new CommonElement(driverTest, FindType.XPath, loadingIcon);
-            return ele.WaitForElementIsInVisible(wait_time, false);
+            CommonElement ele = new(driverTest, FindType.XPath, loadingIcon);
+
+            // Wait until loading icon displays
+            ele.WaitForElementIsVisible();
+
+            // Wait until loading icon closes
+            return ele.WaitForElementIsInVisible();
         }
 
         #endregion
 
         #region "Left Navigation"
 
+        /// <summary>
+        /// Navigate to left page
+        /// </summary>
+        /// <param name="leftMenu"></param>
+        /// <param name="selectedSubMenu"></param>
+        /// <param name="isCaptured"></param>
         public void NavigateToPage(string leftMenu, string selectedSubMenu, bool isCaptured = true)
         {
             //Log.Debug($"Selecting item in the menu...");
@@ -209,7 +221,7 @@ namespace PTO.Base
                 // Hover left menu on the left navigation
                 // Currently, there is only 1 menu
                 IWebElement leftMenu = driverTest.FindElement(By.CssSelector("#side-menu"));
-                UtilsHelper.HoverMouse(driverTest,leftMenu, isCaptured);
+                UtilsHelper.HoverMouse(driverTest, leftMenu, isCaptured);
 
                 // Click selected sub menu
                 string subMenuSelector = $"//a[@class='active']/span[contains(text(),'{selectedSubMenu}')]";
@@ -217,12 +229,96 @@ namespace PTO.Base
                 IWebElement itemNeedToClick = driverTest.FindElement(By.XPath(subMenuSelector));
 
                 if (isCaptured)
-                    ExtentReportsHelper.LogInformation(UtilsHelper.CaptureScreen(driverTest, itemNeedToClick), $"Click item <font color='green'><b><i>{selectedSubMenu}</i></b></font> on left menu.");
- 
+                    ExtentReportsHelper.LogInformation($"Click item <font color='green'><b><i>{selectedSubMenu}</i></b></font> on left menu.", UtilsHelper.CaptureScreen(driverTest, itemNeedToClick));
+
                 itemNeedToClick.Click();
             });
 
             JQueryLoad();
+        }
+
+        #endregion
+
+        #region "Toast Message"
+
+        public string GetToastMeassage(string messageType)
+        {
+            string messCss;
+            if ("title".Equals(messageType.ToLower()))
+            {
+                // Toast message title
+                messCss = "#toastContainer > div >.sst-message-wrapper > div[class ^= 'sst-toast-header']";
+            }
+            else
+            {
+                // Toast message content
+                messCss = "#toastContainer > div >.sst-message-wrapper > div[class ^= 'sst-toast-body']";
+            }
+
+            string result = string.Empty;
+
+            // Get toast message
+            UtilsHelper.WaitForElementIsVisible(driver, FindType.CssSelector, messCss);
+
+            try
+            {
+                IWebElement toastMessElement = ElementFinder.FindElement(FindType.CssSelector, messCss);
+                result = toastMessElement.GetDomProperty("innerText");
+            }
+            catch (Exception e)
+            {
+                UtilsHelper.DebugOutput($"Encountered exception while retrieving toast message {messageType} - Exception: ->\n" + e.StackTrace);
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region "Pages"
+        /// <summary>
+        /// Get the header/title text (title) of the current page
+        /// </summary>
+        /// <returns></returns>
+        public string GetHeaderText()
+        {
+            IWebElement headerName;
+            string headerText;
+            try
+            {
+                headerName = driver.FindElement(By.XPath("//a[contains(@class,'job-title')]"));
+                headerText = headerName.Text;
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"Could not locate header title element for the current page - Exception: ->\n{exception.StackTrace}");
+                headerText = string.Empty;
+            }
+
+            return headerText;
+        }
+
+        /// <summary>
+        /// Get page title from driver
+        /// </summary>
+        /// <returns></returns>
+        public string CurrentTitle
+        {
+            get
+            {
+                return driver.Title;
+            }
+        }
+
+        /// <summary>
+        /// Get curent URL of page
+        /// </summary>
+        public string CurrentURL
+        {
+            get
+            {
+                return driver.Url;
+            }
         }
 
         #endregion

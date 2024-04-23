@@ -7,7 +7,7 @@ namespace PTO.Pages.TakeoffPage
 {
     public partial class TakeoffPage(IWebDriver driverTest) : BasePage(driverTest)
     {
-        protected static IWebDriver driver;
+        protected static IWebDriver? driver;
         private static readonly Lazy<TakeoffPage> _lazy = new Lazy<TakeoffPage>(() => new TakeoffPage(driver));
 
         public static TakeoffPage Instance(IWebDriver driverTest)
@@ -28,6 +28,7 @@ namespace PTO.Pages.TakeoffPage
         #endregion
 
         #region "Work Area"
+        private readonly Button StopRecord_btn = new(driver, FindType.XPath, $"//button[@title='Stop Recording']");
         #endregion
     }
 }

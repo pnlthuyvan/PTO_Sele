@@ -12,6 +12,8 @@ namespace PTO.TestScripts.Pre_Takeoff.Manage_Jobs
     {
         private IWebDriver driverTest;
         private const string JOB_NUMBER = "290224";
+        private const string SHEET = "Sheet_1.2";
+        private const string MEASUREMENT = "BV_KM_2_Import";
 
         public override void SetupTestSectionName()
         {
@@ -31,7 +33,12 @@ namespace PTO.TestScripts.Pre_Takeoff.Manage_Jobs
         [Test, Category($"{Sections.PRE_TAKEOFF_MANAGE_JOB}")]
         public void Pre_Takeoff_Manage_Job_OpenJob()
         {
+            TakeoffPage.Instance(driverTest).IsTakeoffPageDisplayed();
             TakeoffPage.Instance(driverTest).OpenJob(JOB_NUMBER);
+            TakeoffPage.Instance(driverTest).SelectSheet(SHEET);
+            TakeoffPage.Instance(driverTest).ZoomInOut();
+            TakeoffPage.Instance(driverTest).SelectKeyMeasure(MEASUREMENT);
+            TakeoffPage.Instance(driverTest).Linear(MEASUREMENT);
         }
 
         [TearDown]

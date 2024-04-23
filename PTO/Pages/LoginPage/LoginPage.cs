@@ -24,16 +24,16 @@ namespace PTO.Pages.LoginPage
 
             // Assert: Check if the navigation to the login page was successful
             if (!string.IsNullOrEmpty(driverTest.Title) && driverTest.Title == "Pipeline Takeoff")
-                ExtentReportsHelper.LogPassAndCap(driverTest, $"Title is same as expected: 'Pipeline Takeoff'");
+                ExtentReportsHelper.LogPassAndCaptureFullScreen(driverTest, $"Title is same as expected: 'Pipeline Takeoff'");
             else
-                ExtentReportsHelper.LogFailAndCap(driverTest, $"Title is NOT same as expected. Actual: '{driverTest.Title}'");
+                ExtentReportsHelper.LogFailAndCaptureFullScreen(driverTest, $"Title is NOT same as expected. Actual: '{driverTest.Title}'");
 
 
             // Additional assertions or test logic
             if (IsLoggedIn())
-                ExtentReportsHelper.LogPassAndCap(driverTest,$"Login succesfully.");
+                ExtentReportsHelper.LogPassAndCaptureFullScreen(driverTest,$"Login succesfully.");
             else
-                ExtentReportsHelper.LogFailAndCap(driverTest,$"Failed to login.");
+                ExtentReportsHelper.LogFailAndCaptureFullScreen(driverTest,$"Failed to login.");
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace PTO.Pages.LoginPage
         {
             try
             {
-                ExtentReportsHelper.LogInformationAndCap(driverTest, $"Attempting AutoSSO...");
+                ExtentReportsHelper.LogInfoAndCaptureFullScreen(driverTest, $"Attempting AutoSSO...");
 
                 // Input username
                 var userNameTxt = driverTest.FindElement(By.XPath($"//input[contains(@name, 'Email')]"));

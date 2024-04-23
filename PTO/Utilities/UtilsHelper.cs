@@ -38,7 +38,7 @@ namespace PTO.Utilities
                 Actions action = new Actions(driver);
                 action.MoveToElement(control).Perform();
                 if (isCaptured)
-                    ExtentReportsHelper.LogInformation(CaptureScreen(driver, control), $"Hovered on web element '<font color='green'><b><i>{text}</i></b></font>'");
+                    ExtentReportsHelper.LogInformation($"Hovered on web element '<font color='green'><b><i>{text}</i></b></font>'", CaptureScreen(driver, control));
             });
         }
         #endregion
@@ -62,9 +62,9 @@ namespace PTO.Utilities
         /// <param name="timeout"></param>
         /// <param name="captureAndLog"></param>
         /// <returns></returns>
-        public static bool WaitForElementIsVisible(IWebDriver driver, FindType FindType, string ValueToFind, bool captureAndLog = true)
+        public static bool WaitForElementIsVisible(IWebDriver driver, FindType FindType, string ValueToFind, bool captureAndLog = false)
         {
-            DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to become visible within {waitingTimeOut} seconds...");
+            //DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to become visible within {waitingTimeOut} seconds...");
 
             IWebElement element;
 
@@ -92,9 +92,9 @@ namespace PTO.Utilities
                         break;
                 }
                 if (captureAndLog && element != null && element.Displayed)
-                    //CaptureAndLog($"The web element <b>[{FindType:g} : {ValueToFind}]</b> is <font color='green'><b>visible</b></font>.");
+                    ExtentReportsHelper.LogInfoAndCaptureFullScreen(driver, $"The web element <b>[{FindType:g} : {ValueToFind}]</b> is <font color='green'><b>visible</b></font>.");
 
-                    return element.Displayed;
+                return element.Displayed;
             }
             catch (Exception e)
             {
@@ -112,11 +112,11 @@ namespace PTO.Utilities
         /// <param name="timeout"></param>
         /// <param name="captureAndLog"></param>
         /// <returns></returns>
-        public static bool WaitForElementIsInVisible(IWebDriver driver, FindType FindType, string ValueToFind, bool captureAndLog = true)
+        public static bool WaitForElementIsInVisible(IWebDriver driver, FindType FindType, string ValueToFind, bool captureAndLog = false)
         {
-            DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to hide within {waitingTimeOut} seconds...");
+            //DebugOutput($"Waiting for web element [{FindType:g} : {ValueToFind}] to hide within {waitingTimeOut} seconds...");
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(waitingTimeOut));
+            WebDriverWait wait = new(driver, TimeSpan.FromSeconds(waitingTimeOut));
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException), typeof(WebDriverTimeoutException));
             try
             {
@@ -140,7 +140,7 @@ namespace PTO.Utilities
                         break;
                 }
                 if (captureAndLog)
-                    ExtentReportsHelper.LogInformationAndCap(driver, $"Web element <b>[{FindType:g} : {ValueToFind}]</b> is <font color='green'><b>successfully hidden</b></font>.");
+                    ExtentReportsHelper.LogInfoAndCaptureFullScreen(driver, $"Web element <b>[{FindType:g} : {ValueToFind}]</b> is <font color='green'><b>successfully hidden</b></font>.");
                 return hide;
             }
             catch (Exception e)
@@ -208,10 +208,12 @@ namespace PTO.Utilities
         {
             System.Diagnostics.Debug.WriteLine($"{premade_msg}", log_prefix);
             if (TestEnvironment.active_status && add_to_report)
-                ExtentReportsHelper.LogInformation(null, premade_msg);
-            else Debug.WriteLine($"{premade_msg}", log_prefix);
+                ExtentReportsHelper.LogInformation(premade_msg);
+            else 
+                Debug.WriteLine($"{premade_msg}", log_prefix);
 
-            if (!TestEnvironment.active_status && Log != null) Log.Debug($"{log_prefix}: {premade_msg}");
+            if (!TestEnvironment.active_status && Log != null) 
+                Log.Debug($"{log_prefix}: {premade_msg}");
         }
 
         /// <summary>
@@ -243,7 +245,7 @@ namespace PTO.Utilities
         /// <returns></returns>
         public static string TrimArg(string message)
         {
-            if (string.IsNullOrEmpty(message)) 
+            if (string.IsNullOrEmpty(message))
                 return string.Empty;
 
             return (message.Length > 28) ? message[..24].TrimEnd() + ".." : message;
@@ -376,7 +378,7 @@ namespace PTO.Utilities
                 //Log.Debug($"Clicking on web element via JavaScript...");
                 string control_identity = control.Text == string.Empty ? control.ToString() : control.Text;
                 if (isCaptured)
-                    ExtentReportsHelper.LogInformation(CaptureScreen(driver, control), $"Moving to, focusing, and then clicking web element '<font color = 'green'><b>{control_identity}</b></font>' via JavaScript...");
+                    ExtentReportsHelper.LogInformation($"Moving to, focusing, and then clicking web element '<font color = 'green'><b>{control_identity}</b></font>' via JavaScript...", CaptureScreen(driver, control));
 
                 IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
                 executor.ExecuteScript("arguments[0].scrollIntoView({block: 'end'});", control);

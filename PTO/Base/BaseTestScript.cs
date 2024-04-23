@@ -15,6 +15,8 @@ namespace PTO.Base
         public string testName;
         public string testCode;
 
+        #region "Set up Section report"
+
         /// <summary>
         /// Set up the Test Set name
         /// </summary>
@@ -45,6 +47,10 @@ namespace PTO.Base
             this.sectionName = test_section;
         }
 
+        #endregion
+
+        #region "Set up Test case report"
+
         /// <summary>
         /// Override the test case name
         /// </summary>
@@ -65,7 +71,9 @@ namespace PTO.Base
             this.testName = TestContext.CurrentContext.Test.Name;
         }
 
-        /***************************************** SET UP/ TEAR DOWN *****************************************/
+        #endregion
+
+        #region "Set Up / Tear Down"
 
         [OneTimeSetUp]
         public virtual void OnSectionStart()
@@ -96,31 +104,19 @@ namespace PTO.Base
             var stacktrace = string.IsNullOrEmpty(TestContext.CurrentContext.Result.Message)
                 ? ""
                 : $"<pre>{TestContext.CurrentContext.Result.Message}</pre>";
-
-            Status logstatus;
-
-            switch (status)
+            var logstatus = status switch
             {
-                case TestStatus.Failed:
-                    logstatus = Status.Fail;
-                    break;
-                case TestStatus.Inconclusive:
-                    logstatus = Status.Warning;
-                    break;
-                case TestStatus.Skipped:
-                    logstatus = Status.Skip;
-                    break;
-                default:
-                    logstatus = Status.Pass;
-                    break;
-            }
-
+                TestStatus.Failed => Status.Fail,
+                TestStatus.Inconclusive => Status.Warning,
+                TestStatus.Skipped => Status.Skip,
+                _ => Status.Pass,
+            };
             ExtentReportsHelper.GetTest().Log(logstatus, "Test result finished with status " + logstatus + stacktrace);
 
             try
             {
                 if (logstatus == Status.Fail)
-                    ExtentReportsHelper.LogFailAndCap(null, $"Test '{this.testCode}.{this.testName}' in Section '{this.sectionName}' has failed.");
+                    ExtentReportsHelper.LogFail($"Test '{this.testCode}.{this.testName}' in Section '{this.sectionName}' has failed.");
             }
             catch (WebDriverException ex)
             {
@@ -131,7 +127,6 @@ namespace PTO.Base
             UtilsHelper.DebugOutput("-----------------------------------------------------------------------------------------", false);
         }
 
-        /***************************************** END SET UP/ TEAR DOWN *****************************************/
-
+        #endregion
     }
 }

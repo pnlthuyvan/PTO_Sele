@@ -8,5 +8,6 @@
   "reportName": "ExtentReports",
   "timeStampFormat": "MMM dd, yyyy HH:mm:ss a",
   "js": "",
-  "css": ""
+  "css": "",
+  "chartVisibilityOnOpen": true
 }

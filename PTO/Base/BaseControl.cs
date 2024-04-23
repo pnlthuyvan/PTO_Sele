@@ -1,5 +1,4 @@
-﻿using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using PTO.Utilities;
 using PTO.Constants;
 using OpenQA.Selenium.Support.Extensions;
@@ -10,8 +9,6 @@ namespace PTO.Base
     {
         private IWebElement wrappedControl;
         protected IWebDriver driver;
-        protected int defaultTimeout = 5;
-        protected int overrideTime = 5;
 
         protected FindType FindType { get; private set; }
         protected string ValueToFind { get; private set; }
@@ -19,37 +16,35 @@ namespace PTO.Base
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         protected FindElementHelper FindElementHelper { get; private set; }
 
-        private void SetUpBaseControl(IWebElement control, string findType, string valueToFind, int timeoutSeconds)
+        protected void CaptureAndLog(string message)
         {
-            overrideTime = timeoutSeconds;
-            if (FindElementHelper == null)
-                FindElementHelper = FindElementHelper.Instance(driver);
-            switch (findType)
+            ExtentReportsHelper.LogInfoAndCaptureFullScreen(driver, message);
+        }
+
+        #region "Init Base Control"
+
+        /// <summary>
+        /// Set up init control
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="findType"></param>
+        /// <param name="valueToFind"></param>
+        private void SetUpBaseControl(IWebElement control, string? findType, string valueToFind)
+        {
+            FindElementHelper ??= FindElementHelper.Instance(driver);
+
+            this.FindType = findType switch
             {
-                case "Name":
-                    this.FindType = FindType.Name;
-                    break;
-                case "Id":
-                    this.FindType = FindType.Id;
-                    break;
-                case "CssSelector":
-                    this.FindType = FindType.CssSelector;
-                    break;
-                default:
-                    this.FindType = FindType.XPath;
-                    break;
-            }
+                "Name" => FindType.Name,
+                "Id" => FindType.Id,
+                "CssSelector" => FindType.CssSelector,
+                _ => FindType.XPath,
+            };
             ValueToFind = valueToFind;
             if (wrappedControl != null)
                 this.wrappedControl = control;
         }
 
-        protected void CaptureAndLog(string message)
-        {
-            ExtentReportsHelper.LogInformation(UtilsHelper.CaptureScreen(driver), message);
-        }
-
-        #region "Base Control"
         public BaseControl(IWebDriver driver)
         {
             this.driver = driver;
@@ -59,14 +54,14 @@ namespace PTO.Base
         {
             this.driver = driver;
             this.wrappedControl = control;
-            this.ValueToFind = GetXpath(control, "");
-            SetUpBaseControl(control, "XPath", ValueToFind, 5);
+            this.ValueToFind = GetXpath(control, string.Empty);
+            SetUpBaseControl(control, "XPath", ValueToFind);
         }
 
         protected BaseControl(IWebDriver driver, FindType findType, string valueToFind)
         {
             this.driver = driver;
-            SetUpBaseControl(null, findType.ToString("g"), valueToFind, defaultTimeout);
+            SetUpBaseControl(null, findType.ToString("g"), valueToFind);
         }
 
         #endregion
@@ -79,11 +74,7 @@ namespace PTO.Base
         /// <returns></returns>
         public IWebElement RefreshWrappedControl()
         {
-            if (this.defaultTimeout != this.overrideTime)
-                wrappedControl = FindElementHelper.FindElement(this.FindType, this.ValueToFind, this.overrideTime);
-            else
-                wrappedControl = FindElementHelper.FindElement(this.FindType, this.ValueToFind);
-            return wrappedControl;
+            return wrappedControl = FindElementHelper.FindElement(this.FindType, this.ValueToFind);
         }
 
         /// <summary>
@@ -112,11 +103,29 @@ namespace PTO.Base
             }
         }
 
+        /// <summary>
+        /// Get attribute value of control
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
+        internal string GetAttribute(string attribute)
+        {
+            try
+            {
+                return GetWrappedControl().GetAttribute(attribute).ToString();
+            }
+            catch (Exception)
+            {
+                ExtentReportsHelper.LogWarning($"Can't get attribute '{attribute}'");
+                return string.Empty;
+            }
+        }
+
         #endregion
 
         #region "Get attribute"
 
-        public static string GetXpath(IWebElement childElement, string current)
+        public static string GetXpath(IWebElement childElement, string? current)
         {
             if (childElement is null)
                 return null;
@@ -148,12 +157,22 @@ namespace PTO.Base
 
         #region "Wait"
 
-        public bool WaitForElementIsInVisible(int timeout, bool captureAndLog = true)
+        /// <summary>
+        /// Wait until the element is closed
+        /// </summary>
+        /// <param name="captureAndLog"></param>
+        /// <returns></returns>
+        public bool WaitForElementIsInVisible(bool captureAndLog = false)
         {
             return UtilsHelper.WaitForElementIsInVisible(driver, FindType, ValueToFind, captureAndLog);
         }
 
-        public bool WaitForElementIsVisible(bool captureAndLog = true)
+        /// <summary>
+        /// Wait until the element is visible
+        /// </summary>
+        /// <param name="captureAndLog"></param>
+        /// <returns></returns>
+        public bool WaitForElementIsVisible(bool captureAndLog = false)
         {
             return UtilsHelper.WaitForElementIsVisible(driver, FindType, ValueToFind, captureAndLog);
         }
@@ -167,30 +186,31 @@ namespace PTO.Base
         /// </summary>
         /// <param name="isCaptured"></param>
         /// <returns></returns>
-        public bool IsExisted(bool isCaptured = true)
+        public bool IsExisted(bool isCaptured = false)
         {
-            //Log.Debug("Verifying web element exists on screen...");
+            UtilsHelper.WaitForElementIsVisible(driver, FindType, ValueToFind);
+
+            // Verifying web element exists on screen...");
             bool isExisted = false;
-           UtilsHelper.ActionWithTryCatch(() =>
-            {
-                if (GetWrappedControl() != null)
-                {
-                    //Log.Debug($"Successfully detected web element [{FindType:g} : {ValueToFind}]");
-                    if (isCaptured)
-                        CaptureAndLog($"<font color='green'><b>Successfully</b></font> detected web element <font color='green'><b>[{FindType:g} : {ValueToFind}]</b></font>");//'{GetTextOrValue()}'");
-                    isExisted = true;
-                }
-                else
-                {
-                    Log.Debug($"Failed to detect web element [{FindType:g} : {ValueToFind}]");
-                    if (isCaptured)
-                        CaptureAndLog($"<font color='red'><b>Failed</b></font> to detect web element [{FindType:g} : {ValueToFind}]");
-                    isExisted = false;
-                }
-            });
+            UtilsHelper.ActionWithTryCatch(() =>
+             {
+                 if (GetWrappedControl() != null)
+                 {
+                     //Log.Debug($"Successfully detected web element [{FindType:g} : {ValueToFind}]");
+                     if (isCaptured)
+                         CaptureAndLog($"<font color='green'><b>Successfully</b></font> detected web element <font color='green'><b>[{FindType:g} : {ValueToFind}]</b></font>");//'{GetTextOrValue()}'");
+                     isExisted = true;
+                 }
+                 else
+                 {
+                     Log.Debug($"Failed to detect web element [{FindType:g} : {ValueToFind}]");
+                     if (isCaptured)
+                         CaptureAndLog($"<font color='red'><b>Failed</b></font> to detect web element [{FindType:g} : {ValueToFind}]");
+                     isExisted = false;
+                 }
+             });
             return isExisted;
         }
-
 
         /// <summary>
         /// Verified the element displayed on this screen and log the information

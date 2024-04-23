@@ -7,10 +7,8 @@ namespace PTO.Utilities
     public class FindElementHelper
     {
         private int timeoutSeconds = 10;
-        private DefaultWait<IWebDriver> wait;
-        private readonly static log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        private static IWebDriver driver;
+        private DefaultWait<IWebDriver?> wait;
+        private static IWebDriver? driver;
         private static readonly Lazy<FindElementHelper> _lazy = new Lazy<FindElementHelper>(() => new FindElementHelper());
 
         public static FindElementHelper Instance(IWebDriver driverTest)

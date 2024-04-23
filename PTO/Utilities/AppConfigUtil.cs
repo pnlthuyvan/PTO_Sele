@@ -26,6 +26,11 @@ namespace PTO.Utilities
                 .Build();
         }
 
+        /// <summary>
+        /// Get value from setting relying on key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static string? GetAppSetting(string key)
         {
             try
