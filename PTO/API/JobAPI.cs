@@ -1,5 +1,7 @@
-﻿using OpenQA.Selenium;
+﻿using Newtonsoft.Json;
+using OpenQA.Selenium;
 using PTO.Base;
+using PTO.Models;
 using System.Net.Http.Headers;
 
 namespace PTO.API
@@ -37,5 +39,13 @@ namespace PTO.API
             return string.Join("; ", cookies.Select(c => $"{c.Name}={c.Value}"));
         }
 
+        public JobData[] ConvertJsonToJob(string json)
+        {
+            var wrapper = JsonConvert.DeserializeObject<JobDataWrapper>(json);
+            // Access the JobData objects from the wrapper
+            return wrapper.Data;
+        }
+
     }
+
 }

@@ -172,7 +172,7 @@ namespace PTO.Utilities
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ExtentTest LogPass( string details = "LOG", string? pathImg = null)
+        public static ExtentTest LogPass(string details = "LOG", string? pathImg = null)
         {
             string msg = $"    *** PASSED ***  ==  {details}";
 

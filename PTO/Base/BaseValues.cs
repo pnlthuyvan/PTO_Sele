@@ -132,7 +132,7 @@ namespace PTO.Base
         {
             get
             {
-                return BaseValues.Protocol + "://" + BaseValues.ApplicationDomain + "/signin-oidc";
+                return BaseValues.Protocol + "://" + BaseValues.ApplicationDomain;
             }
         }
 

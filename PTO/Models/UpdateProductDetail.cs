@@ -2,8 +2,8 @@
 {
     public class UpdateProductDetail
     {
-        public Guid JobId { get; set; }
-        public Guid ProductId { get; set; }
+        public string JobId { get; set; }
+        public string ProductId { get; set; }
         public int EstimatingSectionId { get; set; }
         public int? EstimatingUseId { get; set; } 
         public int NewEstimatingSectionId { get; set; }
