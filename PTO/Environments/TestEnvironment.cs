@@ -8,6 +8,7 @@ using System.Management;
 using System.Reflection;
 using AventStack.ExtentReports.Reporter;
 using AventStack.ExtentReports;
+using System.ComponentModel;
 
 namespace PTO.Manager
 {
@@ -129,7 +130,8 @@ namespace PTO.Manager
                     KillProcessAndChildren("IEDriverServer.exe");
                 }
             }
-            catch { }
+            catch { 
+            }
         }
 
         [DebuggerNonUserCode]
@@ -139,12 +141,22 @@ namespace PTO.Manager
             if (!OperatingSystem.IsWindows())
                 return;
 
-            var assemblyDirector = AssemblyDirectory();
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher
-            ("Select * From Win32_Process Where Name = '" + p_name + "'");
-            var moc = searcher.Get().Cast<ManagementObject>().ToList();
-            var currentDriverProcess = moc.Where(mo => mo["ExecutablePath"].ToString().Contains(assemblyDirector)).FirstOrDefault();
-            if (null != currentDriverProcess) KillProcessAndChildren(Convert.ToInt32(currentDriverProcess["ProcessID"]));
+            // Get all processes with the name "chromedriver"
+            Process[] chromeDriverProcesses = Process.GetProcessesByName(p_name);
+
+            // Terminate each "chromedriver" process
+            foreach (Process process in chromeDriverProcesses)
+            {
+                try
+                {
+                    process.Kill();
+                    Console.WriteLine($"Process {process.Id} ({process.ProcessName}) terminated.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to terminate process {process.Id}: {ex.Message}");
+                }
+            }
         }
 
         [DebuggerNonUserCode]

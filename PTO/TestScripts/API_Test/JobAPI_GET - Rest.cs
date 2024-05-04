@@ -9,7 +9,7 @@ namespace PTO.TestScripts.API_Test
 {
     [TestFixture]
     [Parallelizable]
-    public class Bearer_GET : BaseTestScript
+    public class JobAPI_GET_1 : BaseTestScript
     {
         private IWebDriver driverTest;
 
@@ -34,7 +34,7 @@ namespace PTO.TestScripts.API_Test
             // TakeoffPage.Instance(driverTest).IsTakeoffPageDisplayed();
 
             JobAPI jobAPI = new JobAPI();
-            var reasonPhrase = jobAPI.GetAllJobs_Van();
+            var reasonPhrase = jobAPI.GetAllJobs_Thanh();
             string responseContent = reasonPhrase.Result;
 
             // Convert JSON to Product object
