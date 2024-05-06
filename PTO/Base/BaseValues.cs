@@ -18,6 +18,8 @@ namespace PTO.Base
 
         public static IWebDriver? FirstDriverTest { get; set; }
 
+        public static string? ApiToken { get; set; }
+
         /// <summary>
         /// Read protocol from appsettings.json file
         /// </summary>
@@ -132,7 +134,7 @@ namespace PTO.Base
         {
             get
             {
-                return BaseValues.Protocol + "://" + BaseValues.ApplicationDomain;
+                return BaseValues.Protocol + "://" + BaseValues.ApplicationDomain + "/signin-oidc";
             }
         }
 
@@ -158,5 +160,30 @@ namespace PTO.Base
                     return $"{ReportLocation}\\{ProjectName}\\Report Build No.{BuildCounter}";
             }
         }
+
+        /// <summary>
+        /// Get APIs URL
+        /// </summary>
+        public static string APIUrl
+        {
+            get
+            {
+                string domain, tenant, customer;
+                if (AppConfigUtil.GetAppSetting(BaseConstants.TENANT).ToString()
+                    .Equals("qa", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    domain = "https://293-app-beta-pipeline-api.dv3.bplhost.com";
+                    customer = "qa";
+                    tenant = "01";
+                }
+                else
+                {
+                    domain = "https://293-app-dev-pipeline-api.azurewebsites.net";
+                    customer = "dev01";
+                    tenant = "01";
+                }
+                return $"{domain}/{customer}/{tenant}"; 
+            }
+        }   
     }
 }

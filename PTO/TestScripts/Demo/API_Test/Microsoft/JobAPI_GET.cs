@@ -2,20 +2,20 @@
 using PTO.Base;
 using PTO.Utilities;
 using Pipeline.Common.Constants;
-using PTO.API;
-using PTO.Models;
+using PTO.Models.Microsoft;
+using PTO.API.Microsoft;
 
-namespace PTO.TestScripts.API_Test
+namespace PTO.TestScripts.Demo.API_Test.Microsoft
 {
     [TestFixture]
     [Parallelizable]
-    public class JobAPI_GET_1 : BaseTestScript
+    public class JobAPI_GET : BaseTestScript
     {
         private IWebDriver driverTest;
 
         public override void SetupTestSectionName()
         {
-            SetupTestSectionName(Sections.PRE_TAKEOFF_MANAGE_JOB);
+            SetupTestSectionName(Sections.API);
         }
 
         [SetUp]
@@ -28,13 +28,11 @@ namespace PTO.TestScripts.API_Test
             driverTest = new BrowserUtility().SetUpCookie(driverTest);
         }
 
-        [Test, Category($"{Sections.PRE_TAKEOFF_MANAGE_JOB}")]
+        [Test, Category($"{Sections.API}")]
         public void GET_APIs()
         {
-            // TakeoffPage.Instance(driverTest).IsTakeoffPageDisplayed();
-
-            JobAPI jobAPI = new JobAPI();
-            var reasonPhrase = jobAPI.GetAllJobs_Thanh();
+            JobAPI jobAPI = new();
+            var reasonPhrase = jobAPI.GetAllJobs();
             string responseContent = reasonPhrase.Result;
 
             // Convert JSON to Product object

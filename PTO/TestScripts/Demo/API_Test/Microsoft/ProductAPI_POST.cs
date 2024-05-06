@@ -2,9 +2,9 @@
 using PTO.Base;
 using PTO.Utilities;
 using Pipeline.Common.Constants;
-using PTO.API;
+using PTO.API.Microsoft;
 
-namespace PTO.TestScripts.API_Test
+namespace PTO.TestScripts.Demo.API_Test.Microsoft
 {
     [TestFixture]
     [Parallelizable]
@@ -14,7 +14,7 @@ namespace PTO.TestScripts.API_Test
 
         public override void SetupTestSectionName()
         {
-            SetupTestSectionName(Sections.PRE_TAKEOFF_MANAGE_JOB);
+            SetupTestSectionName(Sections.API);
         }
 
         [SetUp]
@@ -27,14 +27,22 @@ namespace PTO.TestScripts.API_Test
             driverTest = new BrowserUtility().SetUpCookie(driverTest);
         }
 
-        [Test, Category($"{Sections.PRE_TAKEOFF_MANAGE_JOB}")]
+        [Test, Category($"{Sections.API}")]
         public void POST_APIs()
         {
             ExtentReportsHelper.LogInformation($"<font color='lavender'><b>*************** POST *****************</b></font>");
-            ProductAPI api = new ProductAPI();
-            var reasonPhrase = api.UpdateProductBySection();
+            ProductAPI api = new();
 
-            ExtentReportsHelper.LogInformation("Update status: " + reasonPhrase.ToString());
+            try
+            {
+                var reasonPhrase = api.UpdateProductBySection();
+
+                ExtentReportsHelper.LogInformation("Update status: " + reasonPhrase.ToString());
+            } catch (Exception e)
+            {
+                ExtentReportsHelper.LogFail($"<font color='red'>Failed to send API UpdateProductBySection." +
+                    $"<br>Exception: {e}</font>");
+            }
         }
 
         [TearDown]

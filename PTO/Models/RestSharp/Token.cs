@@ -1,4 +1,4 @@
-﻿namespace PTO.Models
+﻿namespace PTO.Models.RestSharp
 {
     public class Token
     {

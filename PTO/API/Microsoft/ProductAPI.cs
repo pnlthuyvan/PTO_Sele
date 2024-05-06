@@ -1,18 +1,18 @@
 ﻿using Newtonsoft.Json;
 using OpenQA.Selenium;
 using PTO.Base;
-using PTO.Models;
+using PTO.Models.Microsoft;
 using System.Net.Http.Headers;
 
-namespace PTO.API
+namespace PTO.API.Microsoft
 {
     public class ProductAPI
     {
-        private string URL = BaseValues.BaseURL + "/Takeoff/UpdateProductBySection";
+        private readonly string URL = BaseValues.BaseURL + "/Takeoff/UpdateProductBySection";
 
         public async Task<string> UpdateProductBySection()
         {
-            using (HttpClient client = new HttpClient())
+            using (HttpClient client = new())
             {
                 HttpRequestHeaders requestHeaders = client.DefaultRequestHeaders;
                 requestHeaders.Add("Accept", "application/json, text/javascript, */*;q=0.9");
@@ -23,15 +23,13 @@ namespace PTO.API
                 //Rest API
                 UpdateProductDetail updateProductDetailData1 = new UpdateProductDetail
                 {
-                    //JobId = Guid.Parse("0b27f84b-7b28-472e-a2b5-c8d944f23599"),
-                    //ProductId = Guid.Parse("1e2575fc-92fc-4eac-809f-2bfa39e5414f"),
                     JobId = "0b27f84b-7b28-472e-a2b5-c8d944f23599",
                     ProductId = "1e2575fc-92fc-4eac-809f-2bfa39e5414f",
                     EstimatingSectionId = 30,
-                    EstimatingUseId = 420, // This was empty in your description
+                    EstimatingUseId = 403, // This was empty in your description
                     NewEstimatingSectionId = 30,
                     NewEstimatingSectionName = "QA_RT_Section_Auto_PLBM_6848",
-                    NewEstimatingUseId = 403,
+                    NewEstimatingUseId = 420,
                     NewEstimatingUseName = "QA_Use_PLBM_6847",
                     NewColorCode = "#c60c0c"
                 };
@@ -69,33 +67,5 @@ namespace PTO.API
 
             return string.Join("; ", cookies.Select(c => $"{c.Name}={c.Value}"));
         }
-
-
-        public void CreateNewJob()
-        {
-            HttpClient client = new HttpClient();
-
-            HttpRequestHeaders requestHeaders = client.DefaultRequestHeaders;
-            requestHeaders.Add("Accept", "application/json, text/javascript, */*;q=0.9");
-            requestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-            string cookiesString = ConvertCookiesToString(BaseValues.LoginCookieList);
-            requestHeaders.Add("Cookie", cookiesString);
-
-            UpdateProductDetail updateProductDetailData1 = new UpdateProductDetail
-            {
-                //JobId = Guid.Parse("0b27f84b-7b28-472e-a2b5-c8d944f23599"),
-                //ProductId = Guid.Parse("1e2575fc-92fc-4eac-809f-2bfa39e5414f"),
-                JobId = "0b27f84b-7b28-472e-a2b5-c8d944f23599",
-                ProductId = "1e2575fc-92fc-4eac-809f-2bfa39e5414f",
-                EstimatingSectionId = 69,
-                EstimatingUseId = 79, // This was empty in your description
-                NewEstimatingSectionId = 69,
-                NewEstimatingSectionName = "QA_Section_Auto_PLBM_6355",
-                NewEstimatingUseId = 80,
-                NewEstimatingUseName = "QA_RT_Use_PLBM_6339",
-                NewColorCode = "#c60c0c"
-            };
-        }
-
     }
 }
